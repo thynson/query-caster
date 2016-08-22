@@ -1,5 +1,8 @@
 # query-caster
 
+[![Build Status](https://travis-ci.org/thynson/query-caster.svg?branch=master)](https://travis-ci.org/thynson/query-caster)
+[![Coverage Status](https://coveralls.io/repos/github/thynson/query-caster/badge.svg?branch=master)](https://coveralls.io/github/thynson/query-caster?branch=master)
+
 ## Introduction
 
 This library is yet an other SQL builder written in Typescript design
