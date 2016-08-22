@@ -28,9 +28,10 @@ test('SelectBuilder', function(t: test.Test) {
         'SELECT ( SELECT 1 AS "id" )');
 
 
-    t.skip('should be able to join');
+    t.skip('should be able to inner join');
 
-    t.skip('should be able to join with condition');
+    t.skip('should be able to inner join with condition');
+
     t.end();
 });
 

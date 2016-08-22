@@ -10,14 +10,14 @@ import {ExprNode} from './expr';
 
 export class JoinNode extends Node {
 
-    constructor(type: spec.JoinType, source: SelectNode | string | RawNode, alias?: string) {
+    constructor(type: spec.JoinType, source: BearerSelectBuilder | SelectBuilder | string | RawBuilder, alias?: string) {
         super();
         this.joinType = type;
         this.source = source;
         this.alias = alias
     }
     joinType: spec.JoinType;
-    source: SelectNode | string | RawNode;
+    source: BearerSelectBuilder | SelectBuilder | string | RawBuilder;
     alias?: string | null;
     joinCondition?: ExprNode | RawNode;
 
@@ -173,7 +173,7 @@ export class BearerSelectBuilder extends spec.Builder implements spec.BearerSele
         this.selectNode = selectNode;
     }
 
-    from(table: string | BearerSelectBuilder | SelectBuilder, alias?: string): SelectBuilder {
+    from(table: string | spec.BearerSelectBuilderInterface | spec.SelectBuilderInterface, alias?: string): SelectBuilder {
         if (table instanceof BearerSelectBuilder) {
             if (alias == null) throw new Error('alias required');
             return new SelectBuilder(new SelectNode(new FromNode(table.selectNode), this.selectNode.columns));
@@ -233,7 +233,19 @@ export class SelectBuilder extends spec.Builder implements spec.SelectBuilderInt
     }
 
 
-    join(tableName: string | spec.SelectBuilderInterface, aliasName?: string): spec.SelectJoinBuilderInterface{
+    innerJoin(table: string | spec.SelectBuilderInterface | spec.BearerSelectBuilderInterface, aliasName?: string): spec.SelectJoinBuilderInterface{
+        return null;
+    }
+
+    outerJoin(tableName: string | spec.SelectBuilderInterface, aliasName?: string): spec.SelectJoinBuilderInterface {
+        return null;
+    }
+
+    leftJoin(tableName: string | spec.SelectBuilderInterface, aliasName?: string): spec.SelectJoinBuilderInterface{
+        return null;
+    }
+
+    rightJoin(tableName: string | spec.SelectBuilderInterface, aliasName?: string): spec.SelectJoinBuilderInterface{
         return null;
     }
 

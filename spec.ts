@@ -60,7 +60,10 @@ export interface SelectBuilderInterface extends  BuilderInterface {
     field(columnName: string, aliasName?: string): SelectBuilderInterface;
     expr(ex: RawBuilderInterface | ExprBuilderInterface | SelectBuilderInterface, alias?: string): SelectBuilderInterface;
     where(): SelectConditionExprBuilderInterface;
-    join(table: string | SelectBuilderInterface, aliasName?: string): SelectJoinBuilderInterface;
+    innerJoin(table: string | SelectBuilderInterface, aliasName?: string): SelectJoinBuilderInterface;
+    leftJoin(table: string | SelectBuilderInterface, aliasName?: string): SelectJoinBuilderInterface;
+    rightJoin(table: string | SelectBuilderInterface, aliasName?: string): SelectJoinBuilderInterface;
+    outerJoin(table: string | SelectBuilderInterface, aliasName?: string): SelectJoinBuilderInterface;
     group(columnName: string): SelectGroupingBuilderInterface;
     group(expr: ExprBuilderInterface): SelectGroupingBuilderInterface;
     having(expr: ExprBuilderInterface): SelectHavingExprBuilderInterface;
