@@ -21,9 +21,15 @@ export class RawExprNode extends ExprNode {
     }
 }
 
-export class EqualsExprNode extends ExprNode {
+export abstract class BinaryExprNode extends ExprNode {
     leftHandSide: ExprNode;
     rightHandSide: ExprNode;
+}
+
+export class EqualsExprNode extends BinaryExprNode {
+    constructor() {
+
+    }
     buildSQL(segments: string[], opt :QueryBuilderOptions) {
         segments.push('(');
         this.leftHandSide.buildSQL(segments, opt);
@@ -33,7 +39,7 @@ export class EqualsExprNode extends ExprNode {
     }
 }
 
-export class NotEqualsExprNode extends ExprNode {
+export class NotEqualsExprNode extends BinaryExprNode {
     leftHandSide: ExprNode;
     rightHandSide: ExprNode;
     buildSQL(segments: string[], opt :QueryBuilderOptions) {
@@ -45,7 +51,7 @@ export class NotEqualsExprNode extends ExprNode {
     }
 }
 
-export class GreaterExprNode extends ExprNode {
+export class GreaterExprNode extends BinaryExprNode {
 
     leftHandSide: ExprNode;
     rightHandSide: ExprNode;
@@ -58,7 +64,7 @@ export class GreaterExprNode extends ExprNode {
     }
 }
 
-export class GreaterEqualsExprNode extends ExprNode {
+export class GreaterEqualsExprNode extends BinaryExprNode {
 
     leftHandSide: ExprNode;
     rightHandSide: ExprNode;
@@ -71,7 +77,7 @@ export class GreaterEqualsExprNode extends ExprNode {
     }
 }
 
-export class LessExprNode extends ExprNode {
+export class LessExprNode extends BinaryExprNode {
 
     leftHandSide: ExprNode;
     rightHandSide: ExprNode;
@@ -85,7 +91,7 @@ export class LessExprNode extends ExprNode {
 }
 
 
-export class LessEqualsExprNode extends ExprNode {
+export class LessEqualsExprNode extends BinaryExprNode {
 
     leftHandSide: ExprNode;
     rightHandSide: ExprNode;
@@ -119,7 +125,7 @@ export class NotExprNode extends ExprNode {
     }
 }
 
-export class AndExprNode extends ExprNode {
+export class AndExprNode extends BinaryExprNode {
 
     leftHandSide: ExprNode;
     rightHandSide: ExprNode;
@@ -127,6 +133,18 @@ export class AndExprNode extends ExprNode {
         segments.push('(');
         this.leftHandSide.buildSQL(segments, opt);
         segments.push('AND');
+        this.rightHandSide.buildSQL(segments, opt);
+        segments.push(')');
+    }
+}
+export class OrExprNode extends BinaryExprNode {
+
+    leftHandSide: ExprNode;
+    rightHandSide: ExprNode;
+    buildSQL(segments: string[], opt :QueryBuilderOptions) {
+        segments.push('(');
+        this.leftHandSide.buildSQL(segments, opt);
+        segments.push('OR');
         this.rightHandSide.buildSQL(segments, opt);
         segments.push(')');
     }
