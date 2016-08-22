@@ -1,4 +1,5 @@
 
+import {ValueBuilder} from "./value";
 export interface QueryBuilderOptions {
     escapeValue(value: any ): string;
     escapeIdentifier(name: string):string;
@@ -47,18 +48,23 @@ export interface BuilderInterface extends Builder {
 export interface RawBuilderInterface extends BuilderInterface {
 }
 
+export interface ValueBuilderInterface extends BuilderInterface {
+}
+
 export interface ExprBuilderInterface extends BuilderInterface {
 }
 
+export type BearerSelectColumnType = RawBuilderInterface | ExprBuilderInterface | ValueBuilderInterface;
+
 export interface BearerSelectBuilderInterface extends BuilderInterface {
-    expr(ex: RawBuilderInterface | ExprBuilderInterface, alias?: string): BearerSelectBuilderInterface;
+    expr(ex: BearerSelectColumnType, alias?: string): BearerSelectBuilderInterface;
     from(tableName: string | BearerSelectBuilderInterface | SelectBuilderInterface, alias?: string): SelectBuilderInterface;
 }
 
 
 export interface SelectBuilderInterface extends  BuilderInterface {
     field(columnName: string, aliasName?: string): SelectBuilderInterface;
-    expr(ex: RawBuilderInterface | ExprBuilderInterface | SelectBuilderInterface, alias?: string): SelectBuilderInterface;
+    expr(ex: BearerSelectColumnType, alias?: string): SelectBuilderInterface;
     where(): SelectConditionExprBuilderInterface;
     innerJoin(table: string | SelectBuilderInterface, aliasName?: string): SelectJoinBuilderInterface;
     leftJoin(table: string | SelectBuilderInterface, aliasName?: string): SelectJoinBuilderInterface;

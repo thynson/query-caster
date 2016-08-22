@@ -2,31 +2,26 @@ import * as spec  from './spec';
 import {Node} from './node';
 
 export class RawNode extends Node {
-    value: any;
-    constructor(value: any) {
+    rawString: string;
+    constructor(rawString: any) {
         super();
-        this.value = value;
+        this.rawString = rawString;
     }
 
     buildSQL(segment: string[], opt: spec.QueryBuilderOptions) {
-        segment.push(opt.escapeValue(this.value));
+        segment.push(this.rawString);
     }
 }
 
 export class RawBuilder extends spec.Builder implements spec.BuilderInterface {
 
-    raw: RawNode | string;
-    constructor(rawNode: RawNode | string) {
+    raw: RawNode;
+    constructor(rawString:  string) {
         super();
-        this.raw = rawNode;
+        this.raw = new RawNode(rawString);
     }
 
     buildSQL(segments: string[], options: spec.QueryBuilderOptions) {
-        if (this.raw instanceof RawNode) {
-            this.raw.buildSQL(segments, options);
-        } else {
-            segments.push(this.raw);
-        }
+        this.raw.buildSQL(segments, options);
     }
-
 }

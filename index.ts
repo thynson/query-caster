@@ -5,7 +5,8 @@ import * as spec from './spec';
 
 import {Node} from './node';
 import {RawNode, RawBuilder} from './raw';
-import {ExprNode} from './expr';
+import {ValueNode, ValueBuilder} from './value';
+import {ExprNode, BinaryExprNode, EqualsExprNode} from './expr';
 
 
 export class JoinNode extends Node {
@@ -81,23 +82,23 @@ export class FromNode extends Node {
 
 
 export class SelectColumnsNode extends Node {
-    column: string | RawBuilder | SelectBuilder | BearerSelectBuilder;
+    column: string | spec.BearerSelectColumnType;
     aliasName?: string;
-    constructor(columnName: string | RawBuilder | SelectBuilder | BearerSelectBuilder, aliasName?:string) {
+    constructor(columnName: string | spec.BearerSelectColumnType, aliasName?:string) {
         super();
         this.column = columnName;
         this.aliasName = aliasName;
     }
 
     buildSQL(segments: string[], opt: spec.QueryBuilderOptions) {
-        if (this.column instanceof RawBuilder) {
-            this.column.buildSQL(segments, opt);
+        if (typeof this.column === 'string') {
+            segments.push(opt.escapeIdentifier(this.column));
         } else if (this.column instanceof SelectBuilder || this.column instanceof BearerSelectBuilder) {
             segments.push('(');
             this.column.buildSQL(segments, opt);
             segments.push(')');
         } else {
-            segments.push(opt.escapeIdentifier(this.column));
+            this.column.buildSQL(segments, opt);
         }
         if (this.aliasName != null) {
             segments.push('AS');
@@ -189,12 +190,8 @@ export class BearerSelectBuilder extends spec.Builder implements spec.BearerSele
         this.selectNode.buildSQL(segments, opt);
     }
 
-    expr(ex: spec.ExprBuilderInterface | spec.RawBuilderInterface | spec.SelectBuilderInterface, alias?: string): spec.BearerSelectBuilderInterface {
-        if (ex instanceof RawBuilder) {
-            this.selectNode.columns.push(new SelectColumnsNode(ex, alias));
-        } if (ex instanceof SelectBuilder || ex instanceof BearerSelectBuilder) {
-            this.selectNode.columns.push(new SelectColumnsNode(ex, alias));
-        }
+    expr(ex: spec.BearerSelectColumnType, alias?: string): spec.BearerSelectBuilderInterface {
+        this.selectNode.columns.push(new SelectColumnsNode(ex, alias));
         return this;
     }
 }
@@ -225,10 +222,8 @@ export class SelectBuilder extends spec.Builder implements spec.SelectBuilderInt
         this.selectNode.buildSQL(segments, opt);
     }
 
-    expr(ex: spec.ExprBuilderInterface | spec.SelectBuilderInterface, alias?: string): spec.SelectBuilderInterface {
-        if (ex instanceof RawBuilder) {
-            this.selectNode.columns.push(new SelectColumnsNode(ex, alias));
-        }
+    expr(ex: spec.BearerSelectColumnType, alias?: string): spec.SelectBuilderInterface {
+        this.selectNode.columns.push(new SelectColumnsNode(ex, alias));
         return this;
     }
 
@@ -269,43 +264,49 @@ implements spec.SelectConditionExprBuilderInterface, spec.SelectConditionBuilder
     }
 
     eq(): this {
-        return null;
+        // let whereNode = this.selectNode.whereNode
+        // assert(whereNode == null || whereNode instanceof BinaryExprNode && whereNode.rightHandSide == null);
+        // if (whereNode == null) {
+        //     this.whereNode = new EqualsExprNode(lhs, rhs);
+        // }
+        // return this;
+        return this;
     }
 
     gt(): this {
-        return null;
+        return this;
     }
 
     lt(): this {
-        return null;
+        return this;
     }
 
     ne(): this {
-        return null;
+        return this;
     }
 
     nil(): this {
-        return null;
+        return this;
     }
 
     between(): this {
-        return null;
+        return this;
     }
 
     in(): this {
-        return null;
+        return this;
     }
 
     not(): this {
-        return null;
+        return this;
     }
 
     and(): this {
-        return null;
+        return this;
     }
 
     or(): this {
-        return null;
+        return this;
     }
 }
 
@@ -321,7 +322,11 @@ export class QueryBuilderFactory {
         return new BearerSelectBuilder(new BearerSelectNode());
     }
 
-    public value(value: any): spec.RawBuilderInterface {
-        return new RawBuilder(value);
+    public value(value: any): spec.BuilderInterface {
+        return new ValueBuilder(value);
+    }
+
+    public raw(rawString: any) :spec.BuilderInterface {
+        return new RawBuilder(rawString);
     }
 }
