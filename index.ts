@@ -81,16 +81,20 @@ export class FromNode extends Node {
 
 
 export class SelectColumnsNode extends Node {
-    columnName: string;
+    column: string | RawBuilder;
     aliasName?: string;
-    constructor(columnName: string, aliasName?:string) {
+    constructor(columnName: string | RawBuilder, aliasName?:string) {
         super();
-        this.columnName = columnName;
+        this.column = columnName;
         this.aliasName = aliasName;
     }
 
     buildSQL(segments: string[], opt: spec.QueryBuilderOptions) {
-        segments.push(opt.escapeIdentifier(this.columnName));
+        if (this.column instanceof RawBuilder) {
+            this.column.buildSQL(segments, opt);
+        } else {
+            segments.push(opt.escapeIdentifier(this.column));
+        }
         if (this.aliasName != null) {
             segments.push(opt.escapeIdentifier(this.aliasName));
         }
@@ -117,6 +121,11 @@ export class BearerSelectNode extends BaseSelectNode {
     columns: SelectColumnsNode[] = [];
     buildSQL(segments: string[], opt: spec.QueryBuilderOptions) {
         segments.push('SELECT');
+        if (this.columns.length == 0) {
+            segments.push('*');
+        } else {
+            this.columns.forEach(x => x.buildSQL(segments, opt));
+        }
     }
 }
 
@@ -172,8 +181,11 @@ export class BearerSelectBuilder extends spec.Builder implements spec.BearerSele
         this.selectNode.buildSQL(segments, opt);
     }
 
-    expr(ex: spec.ExprBuilderInterface, alias?: string): spec.BearerSelectBuilderInterface {
-        return null;
+    expr(ex: spec.ExprBuilderInterface | spec.RawBuilderInterface, alias?: string): spec.BearerSelectBuilderInterface {
+        if (ex instanceof RawBuilder) {
+            this.selectNode.columns.push(new SelectColumnsNode(ex, alias));
+        }
+        return this;
     }
 }
 

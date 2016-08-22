@@ -6,7 +6,9 @@ let factory = new qc.QueryBuilderFactory();
 
 describe('SelectFromBuilder', function(this: Mocha) {
 
-    it('should be able to bearer select')
+    it('should be able to bearer select', function(this:Mocha) {
+        assert.equal(factory.select().expr(factory.value(1)).toSQL(), 'SELECT 1');
+    });
 
     it('should be able to select', function(this: Mocha) {
         assert.equal(factory.select().from('test').toSQL(), 'SELECT * FROM `test`');
