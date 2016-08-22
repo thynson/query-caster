@@ -4,7 +4,7 @@ export * from './spec';
 import * as spec from './spec';
 
 import {Node} from './node';
-import {RawNode} from './raw';
+import {RawNode, RawBuilder} from './raw';
 import {ExprNode} from './expr';
 
 
@@ -39,13 +39,13 @@ export class JoinNode extends Node {
                 throw new assert.AssertionError('dead path');
         }
         if (typeof this.source === 'string') {
-            segments.push(opt.escapeTableName(this.source));
+            segments.push(opt.escapeIdentifier(this.source));
             if (this.alias != null)
-                segments.push(opt.escapeTableName(this.alias));
+                segments.push(opt.escapeIdentifier(this.alias));
         } else {
             if (this.alias == null) throw new Error('alias is required');
             this.source.buildSQL(segments, opt);
-            segments.push(opt.escapeTableName(this.alias));
+            segments.push(opt.escapeIdentifier(this.alias));
         }
 
     }
@@ -72,7 +72,7 @@ export class FromNode extends Node {
             this.source.buildSQL(segments, opt);
             segments.push(this.alias);
         } else {
-            segments.push(opt.escapeTableName(this.source));
+            segments.push(opt.escapeIdentifier(this.source));
         }
         this.joinNodes.forEach((x)=> x.buildSQL(segments, opt));
     }
@@ -81,7 +81,19 @@ export class FromNode extends Node {
 
 
 export class SelectColumnsNode extends Node {
+    columnName: string;
+    aliasName?: string;
+    constructor(columnName: string, aliasName?:string) {
+        super();
+        this.columnName = columnName;
+        this.aliasName = aliasName;
+    }
+
     buildSQL(segments: string[], opt: spec.QueryBuilderOptions) {
+        segments.push(opt.escapeIdentifier(this.columnName));
+        if (this.aliasName != null) {
+            segments.push(opt.escapeIdentifier(this.aliasName));
+        }
     }
 }
 
@@ -102,6 +114,7 @@ export abstract class BaseSelectNode extends Node {
 
 export class BearerSelectNode extends BaseSelectNode {
 
+    columns: SelectColumnsNode[] = [];
     buildSQL(segments: string[], opt: spec.QueryBuilderOptions) {
         segments.push('SELECT');
     }
@@ -109,9 +122,15 @@ export class BearerSelectNode extends BaseSelectNode {
 
 export class SelectNode extends BaseSelectNode{
 
-    columns: SelectColumnsNode | null;
+    columns: SelectColumnsNode[] = [];
     fromNode: FromNode | null;
     whereNode: ExprNode | null;
+
+    constructor(from: FromNode, columns?: SelectColumnsNode[]) {
+        super();
+        this.fromNode = from;
+        this.columns = columns || this.columns;
+    }
 
     getFromNode(): FromNode {
         return this.fromNode;
@@ -128,24 +147,37 @@ export class SelectNode extends BaseSelectNode{
     }
 }
 
-export abstract class QueryBuilder {
 
-    protected selectNode : BearerSelectNode;
-
-    abstract toSQL(opt: spec.QueryBuilderOptions): string;
-}
-
-export class BearerSelectBuilder extends QueryBuilder {
+export class BearerSelectBuilder extends spec.Builder implements spec.BearerSelectBuilderInterface {
     selectNode: BearerSelectNode;
 
+    constructor(selectNode: BearerSelectNode) {
+        super();
+        this.selectNode = selectNode;
+    }
 
-    toSQL(opt: spec.QueryBuilderOptions): string {
+    from(table: string | BearerSelectBuilder | SelectBuilder, alias?: string): SelectBuilder {
+        if (table instanceof BearerSelectBuilder) {
+            if (alias == null) throw new Error('alias required');
+            return new SelectBuilder(new SelectNode(new FromNode(table.selectNode), this.selectNode.columns));
+        } else if (table instanceof SelectBuilder) {
+            if (alias == null) throw new Error('alias required');
+            return new SelectBuilder(new SelectNode(new FromNode(table.selectNode), this.selectNode.columns));
+        } else {
+            return new SelectBuilder(new FromNode(table));
+        }
+    }
+
+    buildSQL(segments: string[], opt: spec.QueryBuilderOptions) {
+        this.selectNode.buildSQL(segments, opt);
+    }
+
+    expr(ex: spec.ExprBuilderInterface, alias?: string): spec.BearerSelectBuilderInterface {
         return null;
     }
 }
 
-
-export class SelectBuilder extends QueryBuilder implements spec.SelectBuilderInterface {
+export class SelectBuilder extends spec.Builder implements spec.SelectBuilderInterface {
 
     selectNode: SelectNode = null;
 
@@ -154,22 +186,12 @@ export class SelectBuilder extends QueryBuilder implements spec.SelectBuilderInt
         if (node instanceof SelectNode) {
             this.selectNode = node;
         } else {
-            this.selectNode = new SelectNode();
-            this.selectNode.fromNode = node;
+            this.selectNode = new SelectNode(node);
         }
     }
 
-    private fromTable(table) {
-
-    }
-
-    private ensureNode(node?: SelectNode): this {
-        if (this.selectNode == null) this.selectNode = node || new SelectNode();
-        return this;
-    }
-
-
     field(columnName: string, aliasName?: string): this {
+        this.selectNode.columns.push(new SelectColumnsNode(columnName, aliasName));
         return this;
     }
 
@@ -177,14 +199,8 @@ export class SelectBuilder extends QueryBuilder implements spec.SelectBuilderInt
         return new SelectWhereBuilder(this.selectNode);
     }
 
-    public toSQL(options?: spec.QueryBuilderOptions):string {
-        let segments: string[] = [];
-        let opt: spec.QueryBuilderOptions = {
-            formatValue: (x)=> x.toString(),
-            escapeTableName: (x)=> `\`${x}\``
-        };
+    buildSQL(segments: string[], opt: spec.QueryBuilderOptions) {
         this.selectNode.buildSQL(segments, opt);
-        return segments.join(' ');
     }
 
     expr(ex: spec.ExprBuilderInterface | spec.SelectBuilderInterface, alias?: string): spec.SelectBuilderInterface {
@@ -264,13 +280,11 @@ export class QueryBuilderFactory {
         this.options = options;
     }
 
-    public selectFrom(table: string | spec.SelectBuilderInterface, alias?: string) :spec.SelectBuilderInterface {
-        if (typeof table === 'string') {
-            return new SelectBuilder(new FromNode(table, alias));
-        } else if (table instanceof SelectBuilder || table instanceof BearerSelectBuilder) {
-            return new SelectBuilder(new FromNode(table.selectNode, alias));
-        } else {
-            throw new TypeError('type of table is neither string nor a SelectBuilder');
-        }
+    public select(): spec.BearerSelectBuilderInterface {
+        return new BearerSelectBuilder(new BearerSelectNode());
+    }
+
+    public value(value: any): spec.RawBuilderInterface {
+        return new RawBuilder(value);
     }
 }

@@ -10,7 +10,7 @@ export abstract class ExprNode extends Node {
 export abstract class ValueExprNode extends ExprNode {
     value: any;
     buildSQL(segments: string[], opt :QueryBuilderOptions) {
-        segments.push(opt.formatValue(this.value));
+        segments.push(opt.escapeValue(this.value));
     }
 }
 

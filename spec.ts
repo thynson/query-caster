@@ -1,7 +1,7 @@
 
 export interface QueryBuilderOptions {
-    formatValue(value: any ): string;
-    escapeTableName(tableName: string):string;
+    escapeValue(value: any ): string;
+    escapeIdentifier(name: string):string;
 }
 
 
@@ -28,17 +28,40 @@ export interface ConditionExprBuilderTemplate<T> {
     not(): this;
 }
 
-export interface ExprBuilderInterface {
+export abstract class Builder {
+
+    abstract buildSQL(segments: string[], options?: QueryBuilderOptions);
+    toSQL(options?: QueryBuilderOptions):string {
+
+        let segments: string[] = [];
+        let opt = options || <QueryBuilderOptions> {
+                escapeValue: (x)=> x.toString(),
+                escapeIdentifier: (x)=> `\`${x}\``
+            };
+        this.buildSQL(segments, opt);
+        return segments.join(' ');
+    }
 
 }
 
-export interface BearerSelectBuilderInterface {
+export interface BuilderInterface extends Builder {
+    buildSQL(segments: string[], options?: QueryBuilderOptions);
+}
+
+export interface RawBuilderInterface extends BuilderInterface {
+}
+
+export interface ExprBuilderInterface extends BuilderInterface {
+}
+
+export interface BearerSelectBuilderInterface extends BuilderInterface {
 
     expr(ex: ExprBuilderInterface, alias?: string): BearerSelectBuilderInterface;
+    from(tableName: string | BearerSelectBuilderInterface | SelectBuilderInterface, alias?: string): SelectBuilderInterface;
 }
 
 
-export interface SelectBuilderInterface extends BearerSelectBuilderInterface {
+export interface SelectBuilderInterface extends  BuilderInterface {
     field(columnName: string, aliasName?: string): SelectBuilderInterface;
     expr(ex: ExprBuilderInterface, alias?: string): SelectBuilderInterface;
     expr(ex: SelectBuilderInterface, alias?: string): SelectBuilderInterface;
