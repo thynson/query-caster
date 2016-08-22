@@ -96,6 +96,7 @@ export class SelectColumnsNode extends Node {
             segments.push(opt.escapeIdentifier(this.column));
         }
         if (this.aliasName != null) {
+            segments.push('AS');
             segments.push(opt.escapeIdentifier(this.aliasName));
         }
     }
@@ -141,14 +142,17 @@ export class SelectNode extends BaseSelectNode{
         this.columns = columns || this.columns;
     }
 
-    getFromNode(): FromNode {
-        return this.fromNode;
-    }
 
     buildSQL(segments: string[], opt: spec.QueryBuilderOptions) {
         segments.push('SELECT');
-        //if (colums == null)
-        segments.push('*');
+        if (this.columns.length == 0) {
+            segments.push('*');
+        } else {
+            this.columns.map((x, i)=> {
+                if (i > 0) segments.push(',')
+                x.buildSQL(segments, opt);
+            });
+        }
         if (this.fromNode)
             this.fromNode.buildSQL(segments, opt);
         if (this.whereNode)
@@ -181,7 +185,7 @@ export class BearerSelectBuilder extends spec.Builder implements spec.BearerSele
         this.selectNode.buildSQL(segments, opt);
     }
 
-    expr(ex: spec.ExprBuilderInterface | spec.RawBuilderInterface, alias?: string): spec.BearerSelectBuilderInterface {
+    expr(ex: spec.ExprBuilderInterface | spec.RawBuilderInterface | spec.SelectBuilderInterface, alias?: string): spec.BearerSelectBuilderInterface {
         if (ex instanceof RawBuilder) {
             this.selectNode.columns.push(new SelectColumnsNode(ex, alias));
         }
@@ -216,7 +220,10 @@ export class SelectBuilder extends spec.Builder implements spec.SelectBuilderInt
     }
 
     expr(ex: spec.ExprBuilderInterface | spec.SelectBuilderInterface, alias?: string): spec.SelectBuilderInterface {
-        return null;
+        if (ex instanceof RawBuilder) {
+            this.selectNode.columns.push(new SelectColumnsNode(ex, alias));
+        }
+        return this;
     }
 
 

@@ -51,19 +51,16 @@ export interface ExprBuilderInterface extends BuilderInterface {
 }
 
 export interface BearerSelectBuilderInterface extends BuilderInterface {
-
-    expr(ex: ExprBuilderInterface, alias?: string): BearerSelectBuilderInterface;
+    expr(ex: RawBuilderInterface | ExprBuilderInterface, alias?: string): BearerSelectBuilderInterface;
     from(tableName: string | BearerSelectBuilderInterface | SelectBuilderInterface, alias?: string): SelectBuilderInterface;
 }
 
 
 export interface SelectBuilderInterface extends  BuilderInterface {
     field(columnName: string, aliasName?: string): SelectBuilderInterface;
-    expr(ex: ExprBuilderInterface, alias?: string): SelectBuilderInterface;
-    expr(ex: SelectBuilderInterface, alias?: string): SelectBuilderInterface;
+    expr(ex: RawBuilderInterface | ExprBuilderInterface | SelectBuilderInterface, alias?: string): SelectBuilderInterface;
     where(): SelectConditionExprBuilderInterface;
     join(table: string | SelectBuilderInterface, aliasName?: string): SelectJoinBuilderInterface;
-    // join(sb: SelectBuilderInterface, aliasName: string): SelectJoinBuilderInterface;
     group(columnName: string): SelectGroupingBuilderInterface;
     group(expr: ExprBuilderInterface): SelectGroupingBuilderInterface;
     having(expr: ExprBuilderInterface): SelectHavingExprBuilderInterface;

@@ -18,6 +18,10 @@ test('SelectBuilder', function(t: test.Test) {
         'SELECT * FROM "test"',
         'Select table');
 
+    t.equal(factory.select().from('test').field('id').expr(factory.value(1), 'value').toSQL(defaultOpt),
+        'SELECT "id" , 1 AS "value" FROM "test"',
+        'Select from table with immediate value');
+
     t.skip('should be able to join');
 
     t.skip('should be able to join with condition');
