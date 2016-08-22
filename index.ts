@@ -175,14 +175,11 @@ export class BearerSelectBuilder extends spec.Builder implements spec.BearerSele
     }
 
     from(table: string | spec.BearerSelectBuilderInterface | spec.SelectBuilderInterface, alias?: string): SelectBuilder {
-        if (table instanceof BearerSelectBuilder) {
+        if (table instanceof BearerSelectBuilder || table instanceof SelectBuilder) {
             if (alias == null) throw new Error('alias required');
-            return new SelectBuilder(new SelectNode(new FromNode(table.selectNode), this.selectNode.columns));
-        } else if (table instanceof SelectBuilder) {
-            if (alias == null) throw new Error('alias required');
-            return new SelectBuilder(new SelectNode(new FromNode(table.selectNode), this.selectNode.columns));
+            return new SelectBuilder(new SelectNode(new FromNode(table.selectNode, alias), this.selectNode.columns));
         } else {
-            return new SelectBuilder(new FromNode(table));
+            return new SelectBuilder(new SelectNode(new FromNode(table, alias)));
         }
     }
 
@@ -200,13 +197,9 @@ export class SelectBuilder extends spec.Builder implements spec.SelectBuilderInt
 
     selectNode: SelectNode = null;
 
-    constructor(node: SelectNode | FromNode) {
+    constructor(node: SelectNode) {
         super();
-        if (node instanceof SelectNode) {
-            this.selectNode = node;
-        } else {
-            this.selectNode = new SelectNode(node);
-        }
+        this.selectNode = node;
     }
 
     field(columnName: string, aliasName?: string): this {
