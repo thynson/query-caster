@@ -4,7 +4,7 @@ import * as assert from 'assert';
 
 let factory = new qc.QueryBuilderFactory();
 
-describe('SelectFromBuilder', function(this: Mocha) {
+describe('SelectBuilder', function(this: Mocha) {
 
     it('should be able to bearer select', function(this:Mocha) {
         assert.equal(factory.select().expr(factory.value(1)).toSQL(), 'SELECT 1');
