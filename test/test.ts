@@ -1,61 +1,69 @@
 ///<reference path="../typings/index.d.ts"/>
+import * as test from 'tape';
 import * as qc from '../index';
-import * as assert from 'assert';
 
 let factory = new qc.QueryBuilderFactory();
 
-describe('SelectBuilder', function(this: Mocha) {
+test('SelectBuilder', function(t: test.Test) {
+    t.equal(factory.select().expr(factory.value(1)).toSQL(),
+        'SELECT 1',
+        'Select immediate value');
 
-    it('should be able to bearer select', function(this:Mocha) {
-        assert.equal(factory.select().expr(factory.value(1)).toSQL(), 'SELECT 1');
-    });
 
-    it('should be able to select', function(this: Mocha) {
-        assert.equal(factory.select().from('test').toSQL(), 'SELECT * FROM `test`');
-    });
+    t.equal(factory.select().from('test').toSQL(),
+        'SELECT * FROM `test`',
+        'Select table');
 
-    it('should be able to join');
+    t.skip('should be able to join');
 
-    it('should be able to join with condition');
+    t.skip('should be able to join with condition');
+    t.end();
 });
 
-describe('InsertBuilder', function(this: Mocha) {
-    it('should be able to insert constant value');
+test.skip('InsertBuilder', function(t: test.Test) {
+    t.skip('should be able to insert constant value');
 
-    it('should be able to insert select');
+    t.skip('should be able to insert select');
+    t.end();
 
 });
 
-describe('DeleteBuilder', function(this: Mocha) {
-    it('should be able to delete all rows in a table');
+test('DeleteBuilder', function(t: test.Test) {
+    t.skip('should be able to delete all rows in a table');
 
-    it('should be able to delete filtered rows from a table');
+    t.skip('should be able to delete filtered rows from a table');
 
-    it('should be able to join tables when deleting');
-});
+    t.skip('should be able to join tables when deleting');
+    t.end();
 
-
-describe('UpdateBuilder', function(this: Mocha) {
-    it('should be able to update all rows in a table');
-
-    it('should be able to update filtered rows from a table');
-
-    it('should be able to update while reference rows');
 });
 
 
-describe('TableBuilder', function(this: Mocha) {
+test('UpdateBuilder', function(t: test.Test) {
+    t.skip('should be able to update all rows in a table');
 
-    it('should be able to create table');
+    t.skip('should be able to update filtered rows from a table');
 
-    it('should be able to drop table');
+    t.skip('should be able to update while reference rows');
+    t.end();
 
-    it('should be able to add columns');
+});
 
-    it('should be able to drop columns');
 
-    it('should be able to add index');
+test('TableBuilder', function(t: test.Test) {
 
-    it('should be able to drop index');
+    t.skip('should be able to create table');
+
+    t.skip('should be able to drop table');
+
+    t.skip('should be able to add columns');
+
+    t.skip('should be able to drop columns');
+
+    t.skip('should be able to add index');
+
+    t.skip('should be able to drop index');
+    t.end();
+
 });
 
