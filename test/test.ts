@@ -22,6 +22,12 @@ test('SelectBuilder', function(t: test.Test) {
         'SELECT "id" , 1 AS "value" FROM "test"',
         'Select from table with immediate value');
 
+    t.throws(()=>factory.select().toSQL(defaultOpt), "Cannot select nothing without a table");
+
+    t.equal(factory.select().expr(factory.select().expr(factory.value(1), 'id')).toSQL(defaultOpt),
+        'SELECT ( SELECT 1 AS "id" )')
+
+
     t.skip('should be able to join');
 
     t.skip('should be able to join with condition');

@@ -81,9 +81,9 @@ export class FromNode extends Node {
 
 
 export class SelectColumnsNode extends Node {
-    column: string | RawBuilder;
+    column: string | RawBuilder | SelectBuilder | BearerSelectBuilder;
     aliasName?: string;
-    constructor(columnName: string | RawBuilder, aliasName?:string) {
+    constructor(columnName: string | RawBuilder | SelectBuilder | BearerSelectBuilder, aliasName?:string) {
         super();
         this.column = columnName;
         this.aliasName = aliasName;
@@ -92,6 +92,10 @@ export class SelectColumnsNode extends Node {
     buildSQL(segments: string[], opt: spec.QueryBuilderOptions) {
         if (this.column instanceof RawBuilder) {
             this.column.buildSQL(segments, opt);
+        } else if (this.column instanceof SelectBuilder || this.column instanceof BearerSelectBuilder) {
+            segments.push('(');
+            this.column.buildSQL(segments, opt);
+            segments.push(')');
         } else {
             segments.push(opt.escapeIdentifier(this.column));
         }
@@ -123,7 +127,7 @@ export class BearerSelectNode extends BaseSelectNode {
     buildSQL(segments: string[], opt: spec.QueryBuilderOptions) {
         segments.push('SELECT');
         if (this.columns.length == 0) {
-            segments.push('*');
+            throw new Error('Nothing to select');
         } else {
             this.columns.forEach(x => x.buildSQL(segments, opt));
         }
@@ -149,7 +153,7 @@ export class SelectNode extends BaseSelectNode{
             segments.push('*');
         } else {
             this.columns.map((x, i)=> {
-                if (i > 0) segments.push(',')
+                if (i > 0) segments.push(',');
                 x.buildSQL(segments, opt);
             });
         }
@@ -187,6 +191,8 @@ export class BearerSelectBuilder extends spec.Builder implements spec.BearerSele
 
     expr(ex: spec.ExprBuilderInterface | spec.RawBuilderInterface | spec.SelectBuilderInterface, alias?: string): spec.BearerSelectBuilderInterface {
         if (ex instanceof RawBuilder) {
+            this.selectNode.columns.push(new SelectColumnsNode(ex, alias));
+        } if (ex instanceof SelectBuilder || ex instanceof BearerSelectBuilder) {
             this.selectNode.columns.push(new SelectColumnsNode(ex, alias));
         }
         return this;
