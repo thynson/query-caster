@@ -24,12 +24,14 @@ export class RawExprNode extends ExprNode {
 export abstract class BinaryExprNode extends ExprNode {
     leftHandSide: ExprNode;
     rightHandSide: ExprNode;
+    constructor(lhs: ExprNode, rhs: ExprNode) {
+        super();
+        this.leftHandSide = lhs;
+        this.rightHandSide = rhs;
+    }
 }
 
 export class EqualsExprNode extends BinaryExprNode {
-    constructor() {
-
-    }
     buildSQL(segments: string[], opt :QueryBuilderOptions) {
         segments.push('(');
         this.leftHandSide.buildSQL(segments, opt);
