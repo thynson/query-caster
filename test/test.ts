@@ -3,15 +3,19 @@ import * as test from 'tape';
 import * as qc from '../index';
 
 let factory = new qc.QueryBuilderFactory();
+let defaultOpt: qc.QueryBuilderOptions = {
+    escapeValue: x => JSON.stringify(x),
+    escapeIdentifier: x => `"${x.replace(/"/g, '""')}"`
+};
 
 test('SelectBuilder', function(t: test.Test) {
-    t.equal(factory.select().expr(factory.value(1)).toSQL(),
+    t.equal(factory.select().expr(factory.value(1)).toSQL(defaultOpt),
         'SELECT 1',
         'Select immediate value');
 
 
-    t.equal(factory.select().from('test').toSQL(),
-        'SELECT * FROM `test`',
+    t.equal(factory.select().from('test').toSQL(defaultOpt),
+        'SELECT * FROM "test"',
         'Select table');
 
     t.skip('should be able to join');

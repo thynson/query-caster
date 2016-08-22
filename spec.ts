@@ -31,13 +31,9 @@ export interface ConditionExprBuilderTemplate<T> {
 export abstract class Builder {
 
     abstract buildSQL(segments: string[], options?: QueryBuilderOptions);
-    toSQL(options?: QueryBuilderOptions):string {
+    toSQL(opt: QueryBuilderOptions):string {
 
         let segments: string[] = [];
-        let opt = options || <QueryBuilderOptions> {
-                escapeValue: (x)=> x.toString(),
-                escapeIdentifier: (x)=> `\`${x}\``
-            };
         this.buildSQL(segments, opt);
         return segments.join(' ');
     }
