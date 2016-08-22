@@ -25,7 +25,7 @@ test('SelectBuilder', function(t: test.Test) {
     t.throws(()=>factory.select().toSQL(defaultOpt), "Cannot select nothing without a table");
 
     t.equal(factory.select().expr(factory.select().expr(factory.value(1), 'id')).toSQL(defaultOpt),
-        'SELECT ( SELECT 1 AS "id" )')
+        'SELECT ( SELECT 1 AS "id" )');
 
 
     t.skip('should be able to join');
