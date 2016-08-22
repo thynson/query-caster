@@ -18,3 +18,44 @@ describe('SelectBuilder', function(this: Mocha) {
 
     it('should be able to join with condition');
 });
+
+describe('InsertBuilder', function(this: Mocha) {
+    it('should be able to insert constant value');
+
+    it('should be able to insert select');
+
+});
+
+describe('DeleteBuilder', function(this: Mocha) {
+    it('should be able to delete all rows in a table');
+
+    it('should be able to delete filtered rows from a table');
+
+    it('should be able to join tables when deleting');
+});
+
+
+describe('UpdateBuilder', function(this: Mocha) {
+    it('should be able to update all rows in a table');
+
+    it('should be able to update filtered rows from a table');
+
+    it('should be able to update while reference rows');
+});
+
+
+describe('TableBuilder', function(this: Mocha) {
+
+    it('should be able to create table');
+
+    it('should be able to drop table');
+
+    it('should be able to add columns');
+
+    it('should be able to drop columns');
+
+    it('should be able to add index');
+
+    it('should be able to drop index');
+});
+
