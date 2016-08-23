@@ -15,13 +15,13 @@ export class RawNode extends Node {
 
 export class RawBuilder extends spec.Builder implements spec.BuilderInterface {
 
-    raw: RawNode;
+    node: RawNode;
     constructor(rawString:  string) {
         super();
-        this.raw = new RawNode(rawString);
+        this.node = new RawNode(rawString);
     }
 
     buildSQL(segments: string[], options: spec.QueryBuilderOptions) {
-        this.raw.buildSQL(segments, options);
+        this.node.buildSQL(segments, options);
     }
 }

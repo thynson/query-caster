@@ -11,14 +11,14 @@ import {ExprNode, BinaryExprNode, EqualsExprNode} from './expr';
 
 export class JoinNode extends Node {
 
-    constructor(type: spec.JoinType, source: BearerSelectBuilder | SelectBuilder | string | RawBuilder, alias?: string) {
+    constructor(type: spec.JoinType, source: BaseSelectNode | RawNode | string, alias?: string) {
         super();
         this.joinType = type;
         this.source = source;
         this.alias = alias
     }
     joinType: spec.JoinType;
-    source: BearerSelectBuilder | SelectBuilder | string | RawBuilder;
+    source: BaseSelectNode | RawNode | string;
     alias?: string | null;
     joinCondition?: ExprNode | RawNode;
 
@@ -80,20 +80,28 @@ export class FromNode extends Node {
 }
 
 
-
 export class SelectColumnsNode extends Node {
-    column: string | spec.BearerSelectColumnType;
+    column: string | Node;
     aliasName?: string;
-    constructor(columnName: string | spec.BearerSelectColumnType, aliasName?:string) {
+    constructor(column: string | spec.BearerSelectColumnType, alias?:string) {
         super();
-        this.column = columnName;
-        this.aliasName = aliasName;
+        if (typeof column === 'string')
+            this.column = column;
+        else if (column instanceof SelectBuilder || column instanceof BearerSelectBuilder) {
+            this.column = column.selectNode;
+        } else if (column instanceof ValueBuilder)
+            this.column = column.valueNode;
+        else if (column instanceof RawBuilder)
+            this.column = column.node;
+        else
+            throw new TypeError('Unrecognized builder');
+        this.aliasName = alias;
     }
 
     buildSQL(segments: string[], opt: spec.QueryBuilderOptions) {
         if (typeof this.column === 'string') {
             segments.push(opt.escapeIdentifier(this.column));
-        } else if (this.column instanceof SelectBuilder || this.column instanceof BearerSelectBuilder) {
+        } else if (this.column instanceof BaseSelectNode) {
             segments.push('(');
             this.column.buildSQL(segments, opt);
             segments.push(')');
