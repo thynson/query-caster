@@ -2,20 +2,40 @@
 import {QueryBuilderOptions}  from './spec';
 import {Node} from './node';
 import {RawNode} from './raw';
-
+import {ValueNode} from './value';
 
 export abstract class ExprNode extends Node {
 }
 
-export abstract class ValueExprNode extends ExprNode {
-    value: any;
+export class ColumnExprNode extends ExprNode {
+    column: string;
+    constructor(column: string) {
+        super();
+        this.column = column;
+    }
+    buildSQL(segments: string[], opt: QueryBuilderOptions) {
+        segments.push(opt.escapeIdentifier(this.column));
+    }
+}
+
+export class ValueExprNode extends ExprNode {
+    value: ValueNode;
+
+    constructor(valueNode: ValueNode) {
+        super();
+        this.value = valueNode;
+    }
     buildSQL(segments: string[], opt :QueryBuilderOptions) {
-        segments.push(opt.escapeValue(this.value));
+        this.value.buildSQL(segments, opt);
     }
 }
 
 export class RawExprNode extends ExprNode {
     rawNode: RawNode;
+    constructor(rawNode: RawNode) {
+        super();
+        this.rawNode = rawNode;
+    }
     buildSQL(segments: string[], opt :QueryBuilderOptions) {
         this.rawNode.buildSQL(segments, opt);
     }

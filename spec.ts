@@ -13,13 +13,14 @@ export enum JoinType{
     OUTER_JOIN
 }
 
-export interface ConditionBuilderTemplate<T> {
+export interface ConditionBuilderTemplate<T> extends BuilderInterface {
     and(): T;
     or(): T;
 }
 
 export interface ConditionExprBuilderTemplate<T> {
-    eq(): T;
+    eq(lhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface,
+       rhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface): T;
     gt(): T;
     lt(): T;
     ne(): T;

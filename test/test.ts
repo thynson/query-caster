@@ -27,6 +27,13 @@ test('SelectBuilder', function(t: test.Test) {
     t.equal(factory.select().expr(factory.select().expr(factory.value(1), 'id')).toSQL(defaultOpt),
         'SELECT ( SELECT 1 AS "id" )');
 
+    t.equal(
+        factory.select()
+            .from('test')
+            .where().eq('id', factory.value(1))
+            .and().eq('a', 'b')
+            .or().eq('user_id', factory.value(2)).toSQL(defaultOpt),
+        'SELECT * FROM "test" WHERE ( ( ( "id" = 1 ) AND ( "a" = "b" ) ) OR ( "user_id" = 2 ) )');
 
     t.skip('should be able to inner join');
 

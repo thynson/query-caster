@@ -6,7 +6,10 @@ import * as spec from './spec';
 import {Node} from './node';
 import {RawNode, RawBuilder} from './raw';
 import {ValueNode, ValueBuilder} from './value';
-import {ExprNode, BinaryExprNode, EqualsExprNode} from './expr';
+import * as expr from './expr';
+import {RawBuilderInterface} from "./spec";
+import {ValueBuilderInterface} from "./spec";
+import {ExprBuilderInterface} from "./spec";
 
 
 export class JoinNode extends Node {
@@ -20,7 +23,7 @@ export class JoinNode extends Node {
     joinType: spec.JoinType;
     source: BaseSelectNode | RawNode | string;
     alias?: string | null;
-    joinCondition?: ExprNode | RawNode;
+    joinCondition?: expr.ExprNode | RawNode;
 
     buildSQL(segments: string[], opt :spec.QueryBuilderOptions) {
         switch(this.joinType) {
@@ -116,7 +119,7 @@ export class SelectColumnsNode extends Node {
 }
 
 export class OrderColumnNode extends Node {
-    by: string | ExprNode | RawNode
+    by: string | expr.ExprNode | RawNode
     ascending: boolean = true;
 
 
@@ -147,7 +150,7 @@ export class SelectNode extends BaseSelectNode{
 
     columns: SelectColumnsNode[] = [];
     fromNode: FromNode | null;
-    whereNode: ExprNode | null;
+    whereNode: expr.ExprNode | null;
 
     constructor(from: FromNode, columns?: SelectColumnsNode[]) {
         super();
@@ -168,8 +171,10 @@ export class SelectNode extends BaseSelectNode{
         }
         if (this.fromNode)
             this.fromNode.buildSQL(segments, opt);
-        if (this.whereNode)
+        if (this.whereNode) {
+            segments.push('WHERE');
             this.whereNode.buildSQL(segments, opt);
+        }
     }
 }
 
@@ -255,22 +260,45 @@ export class SelectBuilder extends spec.Builder implements spec.SelectBuilderInt
     }
 }
 
+enum ExprRelation {
+    AND,
+    OR
+};
+
 export class SelectWhereBuilder
 extends SelectBuilder
 implements spec.SelectConditionExprBuilderInterface, spec.SelectConditionBuilderInterface {
 
+    private nextExprRelation: ExprRelation = ExprRelation.AND;
 
     constructor(node: SelectNode) {
         super(node);
     }
 
-    eq(): this {
-        // let whereNode = this.selectNode.whereNode
-        // assert(whereNode == null || whereNode instanceof BinaryExprNode && whereNode.rightHandSide == null);
-        // if (whereNode == null) {
-        //     this.whereNode = new EqualsExprNode(lhs, rhs);
-        // }
-        // return this;
+    eq(lhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface,
+        rhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface): this {
+
+        let lhsNode: expr.ExprNode, rhsNode: expr.ExprNode = null;
+
+        if (typeof lhs === 'string') lhsNode = new expr.ColumnExprNode(lhs);
+        else if (lhs instanceof RawBuilder) lhsNode = new expr.RawExprNode(lhs.node);
+        else if (lhs instanceof ValueBuilder) lhsNode = new expr.ValueExprNode(lhs.valueNode);
+        else throw new Error('Unrecognized type');
+
+
+        if (typeof rhs === 'string') rhsNode = new expr.ColumnExprNode(rhs);
+        else if (rhs instanceof RawBuilder) rhsNode = new expr.RawExprNode(rhs.node);
+        else if (rhs instanceof ValueBuilder) rhsNode = new expr.ValueExprNode(rhs.valueNode);
+        else throw new Error('Unrecognized type');
+
+        let node = new expr.EqualsExprNode(lhsNode, rhsNode);
+        if (this.selectNode.whereNode == null)
+            this.selectNode.whereNode = node;
+        else if (this.nextExprRelation == ExprRelation.AND)
+            this.selectNode.whereNode = new expr.AndExprNode(this.selectNode.whereNode, node);
+        else
+            this.selectNode.whereNode = new expr.OrExprNode(this.selectNode.whereNode, node);
+
         return this;
     }
 
@@ -303,10 +331,12 @@ implements spec.SelectConditionExprBuilderInterface, spec.SelectConditionBuilder
     }
 
     and(): this {
+        this.nextExprRelation = ExprRelation.AND;
         return this;
     }
 
     or(): this {
+        this.nextExprRelation = ExprRelation.OR;
         return this;
     }
 }

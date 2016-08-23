@@ -15,18 +15,14 @@ export class ValueNode extends Node {
 
 export class ValueBuilder extends spec.Builder implements spec.BuilderInterface {
 
-    valueNode: ValueNode | string;
+    valueNode: ValueNode;
     constructor(value: any) {
         super();
         this.valueNode = new ValueNode(value);
     }
 
     buildSQL(segments: string[], options: spec.QueryBuilderOptions) {
-        if (this.valueNode instanceof ValueNode) {
-            this.valueNode.buildSQL(segments, options);
-        } else {
-            segments.push(this.valueNode);
-        }
+        this.valueNode.buildSQL(segments, options);
     }
 
 }
