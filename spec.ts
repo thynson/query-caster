@@ -21,13 +21,21 @@ export interface ConditionBuilderTemplate<T> extends BuilderInterface {
 export interface ConditionExprBuilderTemplate<T> {
     eq(lhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface,
        rhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface): T;
-    gt(): T;
-    lt(): T;
-    ne(): T;
-    nil(): T;
+    gt(lhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface,
+       rhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface): T;
+    lt(lhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface,
+       rhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface): T;
+
+    ge(lhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface,
+       rhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface): T;
+    le(lhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface,
+       rhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface): T;
+    ne(lhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface,
+       rhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface): T;
+    nil(expr: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface): T;
     between(): T;
     in(): T;
-    not(): this;
+    not(expr: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface): this;
 }
 
 export abstract class Builder {

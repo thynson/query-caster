@@ -128,7 +128,10 @@ export class LessEqualsExprNode extends BinaryExprNode {
 
 export class IsNullExprNode extends ExprNode {
     expr: ExprNode;
-
+    constructor(expr: ExprNode) {
+        super();
+        this.expr = expr;
+    }
     buildSQL(segments: string[], opt :QueryBuilderOptions) {
         segments.push('(');
         this.expr.buildSQL(segments, opt);
@@ -139,6 +142,10 @@ export class IsNullExprNode extends ExprNode {
 
 export class NotExprNode extends ExprNode {
     expr: ExprNode;
+    constructor(expr: ExprNode) {
+        super();
+        this.expr = expr;
+    }
     buildSQL(segments: string[], opt :QueryBuilderOptions) {
         segments.push('(');
         segments.push('NOT');

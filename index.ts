@@ -263,8 +263,14 @@ export class SelectBuilder extends spec.Builder implements spec.SelectBuilderInt
 enum ExprRelation {
     AND,
     OR
-};
+}
 
+function buildNode(x: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface): expr.ExprNode {
+    if (typeof x === 'string') return new expr.ColumnExprNode(x);
+    else if (x instanceof RawBuilder) return new expr.RawExprNode(x.node);
+    else if (x instanceof ValueBuilder) return new expr.ValueExprNode(x.valueNode);
+    else throw new Error('Unrecognized type');
+}
 export class SelectWhereBuilder
 extends SelectBuilder
 implements spec.SelectConditionExprBuilderInterface, spec.SelectConditionBuilderInterface {
@@ -275,23 +281,8 @@ implements spec.SelectConditionExprBuilderInterface, spec.SelectConditionBuilder
         super(node);
     }
 
-    eq(lhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface,
-        rhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface): this {
+    private _append(node) {
 
-        let lhsNode: expr.ExprNode, rhsNode: expr.ExprNode = null;
-
-        if (typeof lhs === 'string') lhsNode = new expr.ColumnExprNode(lhs);
-        else if (lhs instanceof RawBuilder) lhsNode = new expr.RawExprNode(lhs.node);
-        else if (lhs instanceof ValueBuilder) lhsNode = new expr.ValueExprNode(lhs.valueNode);
-        else throw new Error('Unrecognized type');
-
-
-        if (typeof rhs === 'string') rhsNode = new expr.ColumnExprNode(rhs);
-        else if (rhs instanceof RawBuilder) rhsNode = new expr.RawExprNode(rhs.node);
-        else if (rhs instanceof ValueBuilder) rhsNode = new expr.ValueExprNode(rhs.valueNode);
-        else throw new Error('Unrecognized type');
-
-        let node = new expr.EqualsExprNode(lhsNode, rhsNode);
         if (this.selectNode.whereNode == null)
             this.selectNode.whereNode = node;
         else if (this.nextExprRelation == ExprRelation.AND)
@@ -299,22 +290,47 @@ implements spec.SelectConditionExprBuilderInterface, spec.SelectConditionBuilder
         else
             this.selectNode.whereNode = new expr.OrExprNode(this.selectNode.whereNode, node);
 
-        return this;
     }
 
-    gt(): this {
+    eq(lhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface,
+        rhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface): this {
+        this._append(new expr.EqualsExprNode(buildNode(lhs), buildNode(rhs)));
         return this;
     }
-
-    lt(): this {
+    ne(lhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface,
+       rhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface): this {
+        this._append(new expr.NotEqualsExprNode(buildNode(lhs), buildNode(rhs)));
         return this;
     }
-
-    ne(): this {
+    gt(lhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface,
+       rhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface): this {
+        this._append(new expr.GreaterExprNode(buildNode(lhs), buildNode(rhs)));
         return this;
     }
+    lt(lhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface,
+       rhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface): this {
+        this._append(new expr.LessExprNode(buildNode(lhs), buildNode(rhs)));
+        return this;
+    }
+    ge(lhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface,
+       rhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface): this {
+        this._append(new expr.GreaterEqualsExprNode(buildNode(lhs), buildNode(rhs)));
 
-    nil(): this {
+        return this;
+    }
+    le(lhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface,
+       rhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface): this {
+        this._append(new expr.LessEqualsExprNode(buildNode(lhs), buildNode(rhs)));
+        return this;
+    }
+    nil(ex: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface): this {
+        this._append(new expr.IsNullExprNode(buildNode(ex)));
+        return this;
+
+    }
+
+    not(ex: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface): this {
+        this._append(new expr.NotExprNode(buildNode(ex)));
         return this;
     }
 
@@ -323,10 +339,6 @@ implements spec.SelectConditionExprBuilderInterface, spec.SelectConditionBuilder
     }
 
     in(): this {
-        return this;
-    }
-
-    not(): this {
         return this;
     }
 
