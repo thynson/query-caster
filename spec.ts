@@ -34,20 +34,24 @@ export interface ConditionExprBuilderTemplate<T> {
     not(expr: ExprType): this;
 }
 
+export abstract class Node {
+    abstract buildSQL(segments: string[], opt: QueryBuilderOptions);
+}
+
+
 export abstract class Builder {
 
-    abstract buildSQL(segments: string[], options?: QueryBuilderOptions);
-    toSQL(opt: QueryBuilderOptions):string {
+    protected abstract getNode():Node;
 
+    toSQL(opt: QueryBuilderOptions):string {
         let segments: string[] = [];
-        this.buildSQL(segments, opt);
+        this.getNode().buildSQL(segments, opt);
         return segments.join(' ');
     }
 
 }
 
 export interface BuilderInterface extends Builder {
-    buildSQL(segments: string[], options?: QueryBuilderOptions);
 }
 
 export interface RawBuilderInterface extends BuilderInterface {

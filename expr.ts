@@ -1,6 +1,5 @@
 
-import {QueryBuilderOptions}  from './spec';
-import {Node} from './node';
+import {QueryBuilderOptions, Node}  from './spec';
 import {RawNode} from './raw';
 import {ValueNode} from './value';
 

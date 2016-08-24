@@ -1,7 +1,6 @@
 import * as spec  from './spec';
-import {Node} from './node';
 
-export class RawNode extends Node {
+export class RawNode extends spec.Node {
     rawString: string;
     constructor(rawString: any) {
         super();
@@ -19,6 +18,10 @@ export class RawBuilder extends spec.Builder implements spec.BuilderInterface {
     constructor(rawString:  string) {
         super();
         this.node = new RawNode(rawString);
+    }
+
+    protected getNode(): RawNode {
+        return this.node;
     }
 
     buildSQL(segments: string[], options: spec.QueryBuilderOptions) {

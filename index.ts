@@ -3,16 +3,12 @@ import * as assert from 'assert';
 export * from './spec';
 import * as spec from './spec';
 
-import {Node} from './node';
 import {RawNode, RawBuilder} from './raw';
 import {ValueNode, ValueBuilder} from './value';
 import * as expr from './expr';
-import {RawBuilderInterface} from "./spec";
-import {ValueBuilderInterface} from "./spec";
-import {ExprBuilderInterface} from "./spec";
 
 
-export class JoinNode extends Node {
+export class JoinNode extends spec.Node {
 
     constructor(type: spec.JoinType, source: BaseSelectNode | RawNode | string, alias?: string) {
         super();
@@ -55,13 +51,13 @@ export class JoinNode extends Node {
     }
 }
 
-export class FromNode extends Node {
+export class FromNode extends spec.Node {
     constructor(source: BaseSelectNode | string | RawNode, alias?: string) {
         super();
         this.source = source;
         this.alias = alias
     }
-    source: BaseSelectNode | RawNode| string;
+    source: spec.Node | string;
     alias: string | null;
     joinNodes: JoinNode[] = [];
 
@@ -71,7 +67,7 @@ export class FromNode extends Node {
 
     buildSQL(segments: string[], opt: spec.QueryBuilderOptions) {
         segments.push('FROM');
-        if (this.source instanceof Node) {
+        if (this.source instanceof spec.Node) {
             assert(this.alias != null, 'alias name required');
             this.source.buildSQL(segments, opt);
             segments.push(this.alias);
@@ -83,8 +79,8 @@ export class FromNode extends Node {
 }
 
 
-export class SelectColumnsNode extends Node {
-    column: string | Node;
+export class SelectColumnsNode extends spec.Node {
+    column: string | spec.Node;
     aliasName?: string;
     constructor(column: string | spec.BearerSelectColumnType, alias?:string) {
         super();
@@ -118,7 +114,7 @@ export class SelectColumnsNode extends Node {
     }
 }
 
-export class OrderColumnNode extends Node {
+export class OrderColumnNode extends spec.Node {
     by: string | expr.ExprNode | RawNode
     ascending: boolean = true;
 
@@ -129,7 +125,7 @@ export class OrderColumnNode extends Node {
 }
 
 
-export abstract class BaseSelectNode extends Node {
+export abstract class BaseSelectNode extends spec.Node {
 
 }
 
@@ -190,14 +186,17 @@ export class BearerSelectBuilder extends spec.Builder implements spec.BearerSele
     from(table: string | spec.BearerSelectBuilderInterface | spec.SelectBuilderInterface, alias?: string): SelectBuilder {
         if (table instanceof BearerSelectBuilder || table instanceof SelectBuilder) {
             if (alias == null) throw new Error('alias required');
-            return new SelectBuilder(new SelectNode(new FromNode(table.selectNode, alias), this.selectNode.columns));
-        } else {
+            return new SelectBuilder(new SelectNode(new FromNode(table.getNode(), alias), this.selectNode.columns));
+        } else if (typeof table === 'string') {
             return new SelectBuilder(new SelectNode(new FromNode(table, alias)));
+        } else {
+            throw new TypeError('invalid table');
         }
     }
 
-    buildSQL(segments: string[], opt: spec.QueryBuilderOptions) {
-        this.selectNode.buildSQL(segments, opt);
+
+    getNode(): BaseSelectNode {
+        return this.selectNode;
     }
 
     expr(ex: spec.BearerSelectColumnType, alias?: string): spec.BearerSelectBuilderInterface {
@@ -233,6 +232,9 @@ export class SelectBuilder extends spec.Builder implements spec.SelectBuilderInt
         return this;
     }
 
+    getNode(): SelectNode {
+        return this.selectNode;
+    }
 
     innerJoin(table: string | spec.SelectBuilderInterface | spec.BearerSelectBuilderInterface, aliasName?: string): spec.SelectJoinBuilderInterface{
         return null;

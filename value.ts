@@ -1,7 +1,6 @@
 import * as spec  from './spec';
-import {Node} from './node';
 
-export class ValueNode extends Node {
+export class ValueNode extends spec.Node {
     value: any;
     constructor(value: any) {
         super();
@@ -19,6 +18,10 @@ export class ValueBuilder extends spec.Builder implements spec.BuilderInterface 
     constructor(value: any) {
         super();
         this.valueNode = new ValueNode(value);
+    }
+
+    protected getNode(): ValueNode {
+        return this.valueNode;
     }
 
     buildSQL(segments: string[], options: spec.QueryBuilderOptions) {
