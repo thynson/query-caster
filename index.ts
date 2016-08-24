@@ -349,10 +349,10 @@ implements spec.SelectConditionExprBuilderInterface, spec.SelectConditionBuilder
     }
 }
 function QueryCaster(value: spec.ValueType) : spec.ValueBuilderInterface;
-function QueryCaster() : spec.BearerExprBuilderInterface;
+function QueryCaster() : spec.ExprBuilderInterface;
 
 
-function QueryCaster(value?: spec.ValueType) : spec.ValueBuilderInterface | spec.BearerExprBuilderInterface {
+function QueryCaster(value?: spec.ValueType) : spec.ValueBuilderInterface | spec.ExprBuilderInterface {
     if (value == null) return new expr.BearerExprBuilder();
     return new ValueBuilder(value);
 }

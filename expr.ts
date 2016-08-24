@@ -1,5 +1,5 @@
 
-import {QueryBuilderOptions, Node, BearerExprBuilderInterface, ExprType, Builder}  from './spec';
+import {QueryBuilderOptions, Node, ExprBuilderInterface, ExprType, Builder}  from './spec';
 import {RawNode, RawBuilder} from './raw';
 import {ValueNode, ValueBuilder} from './value';
 
@@ -205,7 +205,7 @@ export function asExprNode(x: ExprType): ExprNode {
     else throw new Error('Unrecognized type');
 }
 
-export class BearerExprBuilder extends Builder implements BearerExprBuilderInterface {
+export class BearerExprBuilder extends Builder implements ExprBuilderInterface {
     node: ExprNode;
 
     constructor(){

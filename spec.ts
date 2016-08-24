@@ -59,7 +59,7 @@ export abstract class Builder {
     }
 }
 
-export interface BearerExprBuilderInterface extends ConditionExprBuilderTemplate<Builder> {
+export interface ExprBuilderInterface extends Builder, ConditionExprBuilderTemplate<Builder> {
 }
 
 export interface BuilderInterface extends Builder {
@@ -69,9 +69,6 @@ export interface RawBuilderInterface extends BuilderInterface {
 }
 
 export interface ValueBuilderInterface extends BuilderInterface {
-}
-
-export interface ExprBuilderInterface extends BuilderInterface {
 }
 
 export type BearerSelectColumnType = RawBuilderInterface | ExprBuilderInterface | ValueBuilderInterface;
