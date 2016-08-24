@@ -70,11 +70,13 @@ class FromNode extends spec.Node {
         segments.push('FROM');
         if (this.source instanceof spec.Node) {
             assert(this.alias != null, 'alias name required');
+            segments.push('(');
             this.source.buildSQL(segments, opt);
-            segments.push(this.alias);
+            segments.push(')');
         } else {
             segments.push(opt.escapeIdentifier(this.source));
         }
+        if (this.alias != null) segments.push(opt.escapeIdentifier(this.alias));
         this.joinNodes.forEach((x)=> x.buildSQL(segments, opt));
     }
 }

@@ -65,6 +65,11 @@ test('SelectBuilder', function(t: test.Test) {
         qc.select().from('test').where().in('a', [qc(1), qc(2), qc(3)]).and().between('b', 'c', 'd').toSQL(defaultOpt),
         'SELECT * FROM "test" WHERE ( ( "a" IN ( 1 , 2 , 3 ) ) AND ( "b" BETWEEN "c" AND "d" ) )'
     );
+    t.equal(
+        qc.select().from(qc.select().expr(qc(1)), 'a').toSQL(defaultOpt),
+        'SELECT * FROM ( SELECT 1 ) "a"'
+    );
+
     t.skip('should be able to inner join');
 
     t.skip('should be able to inner join with condition');
