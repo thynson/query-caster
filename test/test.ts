@@ -41,6 +41,12 @@ test('SelectBuilder', function(t: test.Test) {
             .where().gt('a', 'b').or().lt('b', 'c').and().ge('c', 'd').or().le('d', 'e').toSQL(defaultOpt),
         'SELECT * FROM "test" WHERE ( ( ( ( "a" > "b" ) OR ( "b" < "c" ) ) AND ( "c" >= "d" ) ) OR ( "d" <= "e" ) )');
 
+    t.equal(
+        qc.select()
+            .from('test')
+            .where().call("fn", 1,2,3).toSQL(defaultOpt),
+        'SELECT * FROM "test" WHERE fn ( 1 , 2 , 3 )'
+    );
     t.skip('should be able to inner join');
 
     t.skip('should be able to inner join with condition');

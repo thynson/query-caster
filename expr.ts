@@ -177,3 +177,22 @@ export class OrExprNode extends BinaryExprNode {
         segments.push(')');
     }
 }
+
+export class FunctionCallExprNode extends ExprNode {
+    functionName: string;
+    arguments: ValueNode[];
+    constructor(fn: string, args: any[]) {
+        super();
+        this.functionName = fn;
+        this.arguments = args.map(x=> new ValueNode(x));
+    }
+    buildSQL(segments: string[], opt: QueryBuilderOptions) {
+        segments.push(opt.escapeFunction(this.functionName));
+        segments.push('(');
+        this.arguments.forEach((x, i)=> {
+            if (i > 0) segments.push(',');
+            x.buildSQL(segments, opt)
+        });
+        segments.push(')');
+    }
+}

@@ -25,7 +25,6 @@ export interface ConditionExprBuilderTemplate<T> {
     eq(lhs: ExprType, rhs: ExprType): T;
     gt(lhs: ExprType, rhs: ExprType): T;
     lt(lhs: ExprType, rhs: ExprType): T;
-
     ge(lhs: ExprType, rhs: ExprType): T;
     le(lhs: ExprType, rhs: ExprType): T;
     ne(lhs: ExprType, rhs: ExprType): T;
@@ -33,6 +32,7 @@ export interface ConditionExprBuilderTemplate<T> {
     between(): T;
     in(): T;
     not(expr: ExprType): this;
+    call(fn: string, ...args:any[]);
 }
 
 export abstract class Node {

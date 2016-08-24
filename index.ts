@@ -327,6 +327,11 @@ implements spec.SelectConditionExprBuilderInterface, spec.SelectConditionBuilder
 
     }
 
+    call(fn: string, ...args:any[]):this {
+        this._append(new expr.FunctionCallExprNode(fn, args));
+        return this;
+    }
+
     not(ex: spec.ExprType): this {
         this._append(new expr.NotExprNode(buildNode(ex)));
         return this;
