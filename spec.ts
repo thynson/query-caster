@@ -32,7 +32,7 @@ export interface ConditionExprBuilderTemplate<T> {
     between(): T;
     in(): T;
     not(expr: ExprType): this;
-    call(fn: string, ...args:any[]);
+    call(fn: string, ...args:ExprType[]): T;
 }
 
 export abstract class Node {
@@ -49,7 +49,9 @@ export abstract class Builder {
         this.getNode().buildSQL(segments, opt);
         return segments.join(' ');
     }
+}
 
+export interface BearerExprBuilderInterface extends ConditionExprBuilderTemplate<void> {
 }
 
 export interface BuilderInterface extends Builder {

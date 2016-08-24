@@ -268,13 +268,6 @@ enum ExprRelation {
     OR
 }
 
-function buildNode(x: spec.ExprType): expr.ExprNode {
-    if (typeof x === 'string') return new expr.ColumnExprNode(x);
-    else if (x instanceof RawBuilder) return new expr.RawExprNode(x.node);
-    else if (x instanceof ValueBuilder) return new expr.ValueExprNode(x.valueNode);
-    else throw new Error('Unrecognized type');
-}
-
 class SelectWhereBuilder
 extends SelectBuilder
 implements spec.SelectConditionExprBuilderInterface, spec.SelectConditionBuilderInterface {
@@ -297,43 +290,43 @@ implements spec.SelectConditionExprBuilderInterface, spec.SelectConditionBuilder
     }
 
     eq(lhs: spec.ExprType, rhs: spec.ExprType): this {
-        this._append(new expr.EqualsExprNode(buildNode(lhs), buildNode(rhs)));
+        this._append(new expr.EqualsExprNode(expr.asExprNode(lhs), expr.asExprNode(rhs)));
         return this;
     }
     ne(lhs: spec.ExprType, rhs: spec.ExprType): this {
-        this._append(new expr.NotEqualsExprNode(buildNode(lhs), buildNode(rhs)));
+        this._append(new expr.NotEqualsExprNode(expr.asExprNode(lhs), expr.asExprNode(rhs)));
         return this;
     }
     gt(lhs: spec.ExprType, rhs: spec.ExprType): this {
-        this._append(new expr.GreaterExprNode(buildNode(lhs), buildNode(rhs)));
+        this._append(new expr.GreaterExprNode(expr.asExprNode(lhs), expr.asExprNode(rhs)));
         return this;
     }
     lt(lhs: spec.ExprType, rhs: spec.ExprType): this {
-        this._append(new expr.LessExprNode(buildNode(lhs), buildNode(rhs)));
+        this._append(new expr.LessExprNode(expr.asExprNode(lhs), expr.asExprNode(rhs)));
         return this;
     }
     ge(lhs: spec.ExprType, rhs: spec.ExprType): this {
-        this._append(new expr.GreaterEqualsExprNode(buildNode(lhs), buildNode(rhs)));
+        this._append(new expr.GreaterEqualsExprNode(expr.asExprNode(lhs), expr.asExprNode(rhs)));
 
         return this;
     }
     le(lhs: spec.ExprType, rhs: spec.ExprType): this {
-        this._append(new expr.LessEqualsExprNode(buildNode(lhs), buildNode(rhs)));
+        this._append(new expr.LessEqualsExprNode(expr.asExprNode(lhs), expr.asExprNode(rhs)));
         return this;
     }
     nil(ex: spec.ExprType): this {
-        this._append(new expr.IsNullExprNode(buildNode(ex)));
+        this._append(new expr.IsNullExprNode(expr.asExprNode(ex)));
         return this;
 
     }
 
-    call(fn: string, ...args:any[]):this {
+    call(fn: string, ...args:spec.ExprType[]):this {
         this._append(new expr.FunctionCallExprNode(fn, args));
         return this;
     }
 
     not(ex: spec.ExprType): this {
-        this._append(new expr.NotExprNode(buildNode(ex)));
+        this._append(new expr.NotExprNode(expr.asExprNode(ex)));
         return this;
     }
 

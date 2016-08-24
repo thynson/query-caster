@@ -1,7 +1,7 @@
 
-import {QueryBuilderOptions, Node}  from './spec';
-import {RawNode} from './raw';
-import {ValueNode} from './value';
+import {QueryBuilderOptions, Node, BearerExprBuilderInterface, ExprType}  from './spec';
+import {RawNode, RawBuilder} from './raw';
+import {ValueNode, ValueBuilder} from './value';
 
 export abstract class ExprNode extends Node {
 }
@@ -180,11 +180,11 @@ export class OrExprNode extends BinaryExprNode {
 
 export class FunctionCallExprNode extends ExprNode {
     functionName: string;
-    arguments: ValueNode[];
-    constructor(fn: string, args: any[]) {
+    arguments: ExprNode[];
+    constructor(fn: string, args: ExprType[]) {
         super();
         this.functionName = fn;
-        this.arguments = args.map(x=> new ValueNode(x));
+        this.arguments = args.map(asExprNode);
     }
     buildSQL(segments: string[], opt: QueryBuilderOptions) {
         segments.push(opt.escapeFunction(this.functionName));
@@ -194,5 +194,63 @@ export class FunctionCallExprNode extends ExprNode {
             x.buildSQL(segments, opt)
         });
         segments.push(')');
+    }
+}
+
+export function asExprNode(x: ExprType): ExprNode {
+
+    if (typeof x === 'string') return new ColumnExprNode(x);
+    else if (x instanceof RawBuilder) return new RawExprNode(x.node);
+    else if (x instanceof ValueBuilder) return new ValueExprNode(x.valueNode);
+    else throw new Error('Unrecognized type');
+}
+
+export class BearerExprBuilder implements BearerExprBuilderInterface {
+    node: ExprNode;
+
+    constructor(){
+
+    }
+
+    eq(lhs: ExprType, rhs: ExprType): void {
+        this.node = new EqualsExprNode(asExprNode(lhs), asExprNode(rhs));
+    }
+
+    gt(lhs: ExprType, rhs: ExprType): void {
+        this.node = new GreaterExprNode(asExprNode(lhs), asExprNode(rhs));
+    }
+
+    lt(lhs: ExprType, rhs: ExprType): void {
+        this.node = new LessExprNode(asExprNode(lhs), asExprNode(rhs));
+    }
+
+    ge(lhs: ExprType, rhs: ExprType): void {
+        this.node = new GreaterEqualsExprNode(asExprNode(lhs), asExprNode(rhs));
+    }
+
+    le(lhs: ExprType, rhs: ExprType): void {
+        this.node = new LessEqualsExprNode(asExprNode(lhs), asExprNode(rhs));
+    }
+
+    ne(lhs: ExprType, rhs: ExprType): void {
+        this.node = new NotEqualsExprNode(asExprNode(lhs), asExprNode(rhs));
+    }
+
+    nil(expr: ExprType): void {
+        this.node = new IsNullExprNode(asExprNode(expr));
+    }
+
+    between(): void {
+    }
+
+    in(): void {
+    }
+
+    not(expr: ExprType): this {
+        return null;
+    }
+
+    call(fn: string, ...args: ExprType[]): void {
+        this.node = new FunctionCallExprNode(fn, args);
     }
 }
