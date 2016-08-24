@@ -6,9 +6,10 @@ import * as spec from './spec';
 import {RawNode, RawBuilder} from './raw';
 import {ValueNode, ValueBuilder} from './value';
 import * as expr from './expr';
+import {QueryBuilderOptions} from "./spec";
 
 
-export class JoinNode extends spec.Node {
+class JoinNode extends spec.Node {
 
     constructor(type: spec.JoinType, source: BaseSelectNode | RawNode | string, alias?: string) {
         super();
@@ -51,7 +52,7 @@ export class JoinNode extends spec.Node {
     }
 }
 
-export class FromNode extends spec.Node {
+class FromNode extends spec.Node {
     constructor(source: BaseSelectNode | string | RawNode, alias?: string) {
         super();
         this.source = source;
@@ -79,7 +80,7 @@ export class FromNode extends spec.Node {
 }
 
 
-export class SelectColumnsNode extends spec.Node {
+class SelectColumnsNode extends spec.Node {
     column: string | spec.Node;
     aliasName?: string;
     constructor(column: string | spec.BearerSelectColumnType, alias?:string) {
@@ -114,7 +115,7 @@ export class SelectColumnsNode extends spec.Node {
     }
 }
 
-export class OrderColumnNode extends spec.Node {
+class OrderColumnNode extends spec.Node {
     by: string | expr.ExprNode | RawNode
     ascending: boolean = true;
 
@@ -125,11 +126,11 @@ export class OrderColumnNode extends spec.Node {
 }
 
 
-export abstract class BaseSelectNode extends spec.Node {
+abstract class BaseSelectNode extends spec.Node {
 
 }
 
-export class BearerSelectNode extends BaseSelectNode {
+class BearerSelectNode extends BaseSelectNode {
 
     columns: SelectColumnsNode[] = [];
     buildSQL(segments: string[], opt: spec.QueryBuilderOptions) {
@@ -142,7 +143,7 @@ export class BearerSelectNode extends BaseSelectNode {
     }
 }
 
-export class SelectNode extends BaseSelectNode{
+class SelectNode extends BaseSelectNode{
 
     columns: SelectColumnsNode[] = [];
     fromNode: FromNode | null;
@@ -175,7 +176,7 @@ export class SelectNode extends BaseSelectNode{
 }
 
 
-export class BearerSelectBuilder extends spec.Builder implements spec.BearerSelectBuilderInterface {
+class BearerSelectBuilder extends spec.Builder implements spec.BearerSelectBuilderInterface {
     selectNode: BearerSelectNode;
 
     constructor(selectNode: BearerSelectNode) {
@@ -205,7 +206,7 @@ export class BearerSelectBuilder extends spec.Builder implements spec.BearerSele
     }
 }
 
-export class SelectBuilder extends spec.Builder implements spec.SelectBuilderInterface {
+class SelectBuilder extends spec.Builder implements spec.SelectBuilderInterface {
 
     selectNode: SelectNode = null;
 
@@ -273,7 +274,8 @@ function buildNode(x: spec.ExprType): expr.ExprNode {
     else if (x instanceof ValueBuilder) return new expr.ValueExprNode(x.valueNode);
     else throw new Error('Unrecognized type');
 }
-export class SelectWhereBuilder
+
+class SelectWhereBuilder
 extends SelectBuilder
 implements spec.SelectConditionExprBuilderInterface, spec.SelectConditionBuilderInterface {
 
@@ -349,23 +351,18 @@ implements spec.SelectConditionExprBuilderInterface, spec.SelectConditionBuilder
     }
 }
 
-export class QueryBuilderFactory {
+function QueryCaster(value: any) : spec.ValueBuilderInterface {
+    return new ValueBuilder(value);
+}
+namespace QueryCaster {
 
-    private options: spec.QueryBuilderOptions | null;
-
-    constructor(options?: spec.QueryBuilderOptions) {
-        this.options = options;
-    }
-
-    public select(): spec.BearerSelectBuilderInterface {
+    export function select(): spec.BearerSelectBuilderInterface {
         return new BearerSelectBuilder(new BearerSelectNode());
     }
 
-    public value(value: any): spec.BuilderInterface {
-        return new ValueBuilder(value);
-    }
-
-    public raw(rawString: any) :spec.BuilderInterface {
+    export function raw(rawString: any) :spec.BuilderInterface {
         return new RawBuilder(rawString);
     }
 }
+
+export default QueryCaster;
