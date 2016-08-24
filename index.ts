@@ -265,7 +265,7 @@ enum ExprRelation {
     OR
 }
 
-function buildNode(x: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface): expr.ExprNode {
+function buildNode(x: spec.ExprType): expr.ExprNode {
     if (typeof x === 'string') return new expr.ColumnExprNode(x);
     else if (x instanceof RawBuilder) return new expr.RawExprNode(x.node);
     else if (x instanceof ValueBuilder) return new expr.ValueExprNode(x.valueNode);
@@ -292,44 +292,38 @@ implements spec.SelectConditionExprBuilderInterface, spec.SelectConditionBuilder
 
     }
 
-    eq(lhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface,
-        rhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface): this {
+    eq(lhs: spec.ExprType, rhs: spec.ExprType): this {
         this._append(new expr.EqualsExprNode(buildNode(lhs), buildNode(rhs)));
         return this;
     }
-    ne(lhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface,
-       rhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface): this {
+    ne(lhs: spec.ExprType, rhs: spec.ExprType): this {
         this._append(new expr.NotEqualsExprNode(buildNode(lhs), buildNode(rhs)));
         return this;
     }
-    gt(lhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface,
-       rhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface): this {
+    gt(lhs: spec.ExprType, rhs: spec.ExprType): this {
         this._append(new expr.GreaterExprNode(buildNode(lhs), buildNode(rhs)));
         return this;
     }
-    lt(lhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface,
-       rhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface): this {
+    lt(lhs: spec.ExprType, rhs: spec.ExprType): this {
         this._append(new expr.LessExprNode(buildNode(lhs), buildNode(rhs)));
         return this;
     }
-    ge(lhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface,
-       rhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface): this {
+    ge(lhs: spec.ExprType, rhs: spec.ExprType): this {
         this._append(new expr.GreaterEqualsExprNode(buildNode(lhs), buildNode(rhs)));
 
         return this;
     }
-    le(lhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface,
-       rhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface): this {
+    le(lhs: spec.ExprType, rhs: spec.ExprType): this {
         this._append(new expr.LessEqualsExprNode(buildNode(lhs), buildNode(rhs)));
         return this;
     }
-    nil(ex: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface): this {
+    nil(ex: spec.ExprType): this {
         this._append(new expr.IsNullExprNode(buildNode(ex)));
         return this;
 
     }
 
-    not(ex: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface): this {
+    not(ex: spec.ExprType): this {
         this._append(new expr.NotExprNode(buildNode(ex)));
         return this;
     }

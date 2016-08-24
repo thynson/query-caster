@@ -6,6 +6,8 @@ export interface QueryBuilderOptions {
 }
 
 
+export type ExprType = string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface
+
 export enum JoinType{
     INNER_JOIN,
     LEFT_JOIN,
@@ -19,23 +21,17 @@ export interface ConditionBuilderTemplate<T> extends BuilderInterface {
 }
 
 export interface ConditionExprBuilderTemplate<T> {
-    eq(lhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface,
-       rhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface): T;
-    gt(lhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface,
-       rhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface): T;
-    lt(lhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface,
-       rhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface): T;
+    eq(lhs: ExprType, rhs: ExprType): T;
+    gt(lhs: ExprType, rhs: ExprType): T;
+    lt(lhs: ExprType, rhs: ExprType): T;
 
-    ge(lhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface,
-       rhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface): T;
-    le(lhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface,
-       rhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface): T;
-    ne(lhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface,
-       rhs: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface): T;
-    nil(expr: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface): T;
+    ge(lhs: ExprType, rhs: ExprType): T;
+    le(lhs: ExprType, rhs: ExprType): T;
+    ne(lhs: ExprType, rhs: ExprType): T;
+    nil(expr: ExprType): T;
     between(): T;
     in(): T;
-    not(expr: string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface): this;
+    not(expr: ExprType): this;
 }
 
 export abstract class Builder {
