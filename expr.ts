@@ -1,5 +1,5 @@
 
-import {QueryBuilderOptions, Node, BearerExprBuilderInterface, ExprType}  from './spec';
+import {QueryBuilderOptions, Node, BearerExprBuilderInterface, ExprType, Builder}  from './spec';
 import {RawNode, RawBuilder} from './raw';
 import {ValueNode, ValueBuilder} from './value';
 
@@ -205,52 +205,64 @@ export function asExprNode(x: ExprType): ExprNode {
     else throw new Error('Unrecognized type');
 }
 
-export class BearerExprBuilder implements BearerExprBuilderInterface {
+export class BearerExprBuilder extends Builder implements BearerExprBuilderInterface {
     node: ExprNode;
 
     constructor(){
-
+        super()
     }
 
-    eq(lhs: ExprType, rhs: ExprType): void {
+    getNode() { return this.node; }
+
+    eq(lhs: ExprType, rhs: ExprType): Builder {
         this.node = new EqualsExprNode(asExprNode(lhs), asExprNode(rhs));
+        return this;
     }
 
-    gt(lhs: ExprType, rhs: ExprType): void {
+    gt(lhs: ExprType, rhs: ExprType): Builder {
         this.node = new GreaterExprNode(asExprNode(lhs), asExprNode(rhs));
+        return this;
     }
 
-    lt(lhs: ExprType, rhs: ExprType): void {
+    lt(lhs: ExprType, rhs: ExprType): Builder {
         this.node = new LessExprNode(asExprNode(lhs), asExprNode(rhs));
+        return this;
     }
 
-    ge(lhs: ExprType, rhs: ExprType): void {
+    ge(lhs: ExprType, rhs: ExprType): Builder {
         this.node = new GreaterEqualsExprNode(asExprNode(lhs), asExprNode(rhs));
+        return this;
     }
 
-    le(lhs: ExprType, rhs: ExprType): void {
+    le(lhs: ExprType, rhs: ExprType): Builder {
         this.node = new LessEqualsExprNode(asExprNode(lhs), asExprNode(rhs));
+        return this;
     }
 
-    ne(lhs: ExprType, rhs: ExprType): void {
+    ne(lhs: ExprType, rhs: ExprType): Builder {
         this.node = new NotEqualsExprNode(asExprNode(lhs), asExprNode(rhs));
+        return this;
     }
 
-    nil(expr: ExprType): void {
+    nil(expr: ExprType): Builder {
         this.node = new IsNullExprNode(asExprNode(expr));
+        return this;
     }
 
-    between(): void {
+    between(): Builder {
+        return this;
     }
 
-    in(): void {
+    in(): Builder {
+        return this;
     }
 
     not(expr: ExprType): this {
         return null;
     }
 
-    call(fn: string, ...args: ExprType[]): void {
+    call(fn: string, ...args: ExprType[]): Builder {
         this.node = new FunctionCallExprNode(fn, args);
+        return this;
     }
 }

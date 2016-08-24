@@ -8,6 +8,17 @@ let defaultOpt: QueryBuilderOptions = {
     escapeFunction: x=>x
 };
 
+test('ExprBuilder', (t: test.Test) => {
+    t.equals(qc().eq('a', 'b').toSQL(defaultOpt), '( "a" = "b" )');
+    t.equals(qc().ne('a', 'b').toSQL(defaultOpt), '( "a" != "b" )');
+    t.equals(qc().lt('a', 'b').toSQL(defaultOpt), '( "a" < "b" )');
+    t.equals(qc().gt('a', 'b').toSQL(defaultOpt), '( "a" > "b" )');
+    t.equals(qc().le('a', 'b').toSQL(defaultOpt), '( "a" <= "b" )');
+    t.equals(qc().ge('a', 'b').toSQL(defaultOpt), '( "a" >= "b" )');
+    t.equals(qc().call('a', 'b').toSQL(defaultOpt), 'a ( "b" )');
+    t.end();
+});
+
 test('SelectBuilder', function(t: test.Test) {
     t.equal(qc.select().expr(qc(1)).toSQL(defaultOpt),
         'SELECT 1',
@@ -44,7 +55,7 @@ test('SelectBuilder', function(t: test.Test) {
     t.equal(
         qc.select()
             .from('test')
-            .where().call("fn", 1,2,3).toSQL(defaultOpt),
+            .where().call("fn", qc(1), qc(2), qc(3)).toSQL(defaultOpt),
         'SELECT * FROM "test" WHERE fn ( 1 , 2 , 3 )'
     );
     t.skip('should be able to inner join');

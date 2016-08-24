@@ -348,10 +348,15 @@ implements spec.SelectConditionExprBuilderInterface, spec.SelectConditionBuilder
         return this;
     }
 }
+function QueryCaster(value: spec.ValueType) : spec.ValueBuilderInterface;
+function QueryCaster() : spec.BearerExprBuilderInterface;
 
-function QueryCaster(value: any) : spec.ValueBuilderInterface {
+
+function QueryCaster(value?: spec.ValueType) : spec.ValueBuilderInterface | spec.BearerExprBuilderInterface {
+    if (value == null) return new expr.BearerExprBuilder();
     return new ValueBuilder(value);
 }
+
 namespace QueryCaster {
 
     export function select(): spec.BearerSelectBuilderInterface {
@@ -361,6 +366,7 @@ namespace QueryCaster {
     export function raw(rawString: any) :spec.BuilderInterface {
         return new RawBuilder(rawString);
     }
+
 }
 
 export default QueryCaster;

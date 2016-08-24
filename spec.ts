@@ -7,7 +7,15 @@ export interface QueryBuilderOptions {
 }
 
 
-export type ExprType = string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface
+export type ExprType = string | ExprBuilderInterface | RawBuilderInterface | ValueBuilderInterface;
+
+export type ValueType
+    = number    // INT/LONG/
+    | boolean   // BOOLEAN
+    | string    // TEXT/STRING/VARCHAR
+    | Date      // DATE
+    | Buffer    // BLOB
+;
 
 export enum JoinType{
     INNER_JOIN,
@@ -51,7 +59,7 @@ export abstract class Builder {
     }
 }
 
-export interface BearerExprBuilderInterface extends ConditionExprBuilderTemplate<void> {
+export interface BearerExprBuilderInterface extends ConditionExprBuilderTemplate<Builder> {
 }
 
 export interface BuilderInterface extends Builder {
