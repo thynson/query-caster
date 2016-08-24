@@ -178,6 +178,48 @@ export class OrExprNode extends BinaryExprNode {
     }
 }
 
+export class BetweenExprNode extends ExprNode {
+
+    val: ExprNode;
+    from: ExprNode;
+    to: ExprNode;
+    constructor(val: ExprNode, from: ExprNode, to: ExprNode) {
+        super();
+        this.val = val;
+        this.from = from;
+        this.to = to;
+    }
+    buildSQL(segments: string[], opt :QueryBuilderOptions) {
+        segments.push('(');
+        this.val.buildSQL(segments, opt);
+        segments.push('BETWEEN');
+        this.from.buildSQL(segments, opt);
+        segments.push('AND');
+        this.to.buildSQL(segments, opt);
+        segments.push(')');
+    }
+}
+
+export class InExprNode extends ExprNode {
+    val: ExprNode;
+    enumerations: ExprNode[];
+    constructor(val: ExprNode, enumerations: ExprNode[]) {
+        super()
+        this.val = val;
+        this.enumerations = enumerations;
+    }
+    buildSQL(segments: string[], opt :QueryBuilderOptions) {
+        segments.push('(');
+        this.val.buildSQL(segments, opt);
+        segments.push('IN (');
+        this.enumerations.forEach((x,i)=> {
+            if (i > 0) segments.push(',');
+            x.buildSQL(segments, opt);
+        })
+        segments.push(') )');
+    }
+};
+
 export class FunctionCallExprNode extends ExprNode {
     functionName: string;
     arguments: ExprNode[];
@@ -247,11 +289,13 @@ export class BearerExprBuilder extends Builder implements ExprBuilderInterface {
         return this;
     }
 
-    between(): Builder {
+    between(val: ExprType, from: ExprType, to: ExprType): Builder {
+        this.node = new BetweenExprNode(asExprNode(val), asExprNode(from), asExprNode(to));
         return this;
     }
 
-    in(): Builder {
+    in(val: ExprType, enumeration: ExprType[]): Builder {
+        this.node = new InExprNode(asExprNode(val), enumeration.map(asExprNode));
         return this;
     }
 

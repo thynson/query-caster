@@ -304,7 +304,6 @@ implements spec.SelectConditionExprBuilderInterface, spec.SelectConditionBuilder
     nil(ex: spec.ExprType): this {
         this._append(new expr.IsNullExprNode(expr.asExprNode(ex)));
         return this;
-
     }
 
     call(fn: string, ...args:spec.ExprType[]):this {
@@ -317,11 +316,13 @@ implements spec.SelectConditionExprBuilderInterface, spec.SelectConditionBuilder
         return this;
     }
 
-    between(): this {
+    between(val: spec.ExprType, from: spec.ExprType, to: spec.ExprType): this {
+        this._append(new expr.BetweenExprNode(expr.asExprNode(val), expr.asExprNode(from), expr.asExprNode(to)));
         return this;
     }
 
-    in(): this {
+    in(val: spec.ExprType, enumerations: spec.ExprType[]): this {
+        this._append(new expr.InExprNode(expr.asExprNode(val), enumerations.map(expr.asExprNode)));
         return this;
     }
 

@@ -16,6 +16,9 @@ test('ExprBuilder', (t: test.Test) => {
     t.equals(qc().le('a', 'b').toSQL(defaultOpt), '( "a" <= "b" )');
     t.equals(qc().ge('a', 'b').toSQL(defaultOpt), '( "a" >= "b" )');
     t.equals(qc().call('a', 'b').toSQL(defaultOpt), 'a ( "b" )');
+    t.equals(qc().nil('a').toSQL(defaultOpt), '( "a" IS NULL )');
+    t.equals(qc().between('a', qc(1), qc(10)).toSQL(defaultOpt), '( "a" BETWEEN 1 AND 10 )');
+    t.equals(qc().in('a', [qc(1), qc(2), qc(3)]).toSQL(defaultOpt), '( "a" IN ( 1 , 2 , 3 ) )');
     t.end();
 });
 
@@ -57,6 +60,10 @@ test('SelectBuilder', function(t: test.Test) {
             .from('test')
             .where().call("fn", qc(1), qc(2), qc(3)).toSQL(defaultOpt),
         'SELECT * FROM "test" WHERE fn ( 1 , 2 , 3 )'
+    );
+    t.equal(
+        qc.select().from('test').where().in('a', [qc(1), qc(2), qc(3)]).and().between('b', 'c', 'd').toSQL(defaultOpt),
+        'SELECT * FROM "test" WHERE ( ( "a" IN ( 1 , 2 , 3 ) ) AND ( "b" BETWEEN "c" AND "d" ) )'
     );
     t.skip('should be able to inner join');
 

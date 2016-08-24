@@ -36,8 +36,8 @@ export interface ConditionExprBuilderTemplate<T> {
     le(lhs: ExprType, rhs: ExprType): T;
     ne(lhs: ExprType, rhs: ExprType): T;
     nil(expr: ExprType): T;
-    between(): T;
-    in(): T;
+    between(val: ExprType, from: ExprType, to: ExprType): T;
+    in(val: ExprType, enumerations:ExprType[]): T;
     not(expr: ExprType): this;
     call(fn: string, ...args:ExprType[]): T;
 }
