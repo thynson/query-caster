@@ -1,5 +1,4 @@
 
-import {ValueBuilder} from "./value";
 export interface QueryBuilderOptions {
     escapeValue(value: any ): string;
     escapeIdentifier(name: string):string;
@@ -50,11 +49,12 @@ export abstract class Node {
 
 export abstract class Builder {
 
-    protected abstract getNode():Node;
+    protected node: Node;
+    // protected abstract getNode():Node;
 
     toSQL(opt: QueryBuilderOptions):string {
         let segments: string[] = [];
-        this.getNode().buildSQL(segments, opt);
+        this.node.buildSQL(segments, opt);
         return segments.join(' ');
     }
 }

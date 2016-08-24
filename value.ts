@@ -14,18 +14,9 @@ export class ValueNode extends spec.Node {
 
 export class ValueBuilder extends spec.Builder implements spec.BuilderInterface {
 
-    valueNode: ValueNode;
+    node: ValueNode;
     constructor(value: any) {
         super();
-        this.valueNode = new ValueNode(value);
+        this.node = new ValueNode(value);
     }
-
-    protected getNode(): ValueNode {
-        return this.valueNode;
-    }
-
-    buildSQL(segments: string[], options: spec.QueryBuilderOptions) {
-        this.valueNode.buildSQL(segments, options);
-    }
-
 }

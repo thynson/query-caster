@@ -25,7 +25,7 @@ class JoinNode extends spec.Node {
     buildSQL(segments: string[], opt :spec.QueryBuilderOptions) {
         switch(this.joinType) {
             case spec.JoinType.INNER_JOIN:
-                segments.push('INNER JOIN')
+                segments.push('INNER JOIN');
                 break;
             case spec.JoinType.LEFT_JOIN:
                 segments.push('LEFT JOIN');
@@ -88,9 +88,9 @@ class SelectColumnsNode extends spec.Node {
         if (typeof column === 'string')
             this.column = column;
         else if (column instanceof SelectBuilder || column instanceof BearerSelectBuilder) {
-            this.column = column.selectNode;
+            this.column = column.node;
         } else if (column instanceof ValueBuilder)
-            this.column = column.valueNode;
+            this.column = column.node;
         else if (column instanceof RawBuilder)
             this.column = column.node;
         else
@@ -177,17 +177,17 @@ class SelectNode extends BaseSelectNode{
 
 
 class BearerSelectBuilder extends spec.Builder implements spec.BearerSelectBuilderInterface {
-    selectNode: BearerSelectNode;
+    node: BearerSelectNode;
 
     constructor(selectNode: BearerSelectNode) {
         super();
-        this.selectNode = selectNode;
+        this.node = selectNode;
     }
 
     from(table: string | spec.BearerSelectBuilderInterface | spec.SelectBuilderInterface, alias?: string): SelectBuilder {
         if (table instanceof BearerSelectBuilder || table instanceof SelectBuilder) {
             if (alias == null) throw new Error('alias required');
-            return new SelectBuilder(new SelectNode(new FromNode(table.getNode(), alias), this.selectNode.columns));
+            return new SelectBuilder(new SelectNode(new FromNode(table.node, alias), this.node.columns));
         } else if (typeof table === 'string') {
             return new SelectBuilder(new SelectNode(new FromNode(table, alias)));
         } else {
@@ -195,46 +195,33 @@ class BearerSelectBuilder extends spec.Builder implements spec.BearerSelectBuild
         }
     }
 
-
-    getNode(): BaseSelectNode {
-        return this.selectNode;
-    }
-
     expr(ex: spec.BearerSelectColumnType, alias?: string): spec.BearerSelectBuilderInterface {
-        this.selectNode.columns.push(new SelectColumnsNode(ex, alias));
+        this.node.columns.push(new SelectColumnsNode(ex, alias));
         return this;
     }
 }
 
 class SelectBuilder extends spec.Builder implements spec.SelectBuilderInterface {
 
-    selectNode: SelectNode = null;
+    node: SelectNode = null;
 
     constructor(node: SelectNode) {
         super();
-        this.selectNode = node;
+        this.node = node;
     }
 
     field(columnName: string, aliasName?: string): this {
-        this.selectNode.columns.push(new SelectColumnsNode(columnName, aliasName));
+        this.node.columns.push(new SelectColumnsNode(columnName, aliasName));
         return this;
     }
 
     public where(): spec.SelectConditionExprBuilderInterface {
-        return new SelectWhereBuilder(this.selectNode);
-    }
-
-    buildSQL(segments: string[], opt: spec.QueryBuilderOptions) {
-        this.selectNode.buildSQL(segments, opt);
+        return new SelectWhereBuilder(this.node);
     }
 
     expr(ex: spec.BearerSelectColumnType, alias?: string): spec.SelectBuilderInterface {
-        this.selectNode.columns.push(new SelectColumnsNode(ex, alias));
+        this.node.columns.push(new SelectColumnsNode(ex, alias));
         return this;
-    }
-
-    getNode(): SelectNode {
-        return this.selectNode;
     }
 
     innerJoin(table: string | spec.SelectBuilderInterface | spec.BearerSelectBuilderInterface, aliasName?: string): spec.SelectJoinBuilderInterface{
@@ -280,12 +267,12 @@ implements spec.SelectConditionExprBuilderInterface, spec.SelectConditionBuilder
 
     private _append(node) {
 
-        if (this.selectNode.whereNode == null)
-            this.selectNode.whereNode = node;
+        if (this.node.whereNode == null)
+            this.node.whereNode = node;
         else if (this.nextExprRelation == ExprRelation.AND)
-            this.selectNode.whereNode = new expr.AndExprNode(this.selectNode.whereNode, node);
+            this.node.whereNode = new expr.AndExprNode(this.node.whereNode, node);
         else
-            this.selectNode.whereNode = new expr.OrExprNode(this.selectNode.whereNode, node);
+            this.node.whereNode = new expr.OrExprNode(this.node.whereNode, node);
 
     }
 

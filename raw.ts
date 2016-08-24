@@ -19,12 +19,4 @@ export class RawBuilder extends spec.Builder implements spec.BuilderInterface {
         super();
         this.node = new RawNode(rawString);
     }
-
-    protected getNode(): RawNode {
-        return this.node;
-    }
-
-    buildSQL(segments: string[], options: spec.QueryBuilderOptions) {
-        this.node.buildSQL(segments, options);
-    }
 }

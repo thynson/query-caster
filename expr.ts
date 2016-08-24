@@ -201,7 +201,7 @@ export function asExprNode(x: ExprType): ExprNode {
 
     if (typeof x === 'string') return new ColumnExprNode(x);
     else if (x instanceof RawBuilder) return new RawExprNode(x.node);
-    else if (x instanceof ValueBuilder) return new ValueExprNode(x.valueNode);
+    else if (x instanceof ValueBuilder) return new ValueExprNode(x.node);
     else throw new Error('Unrecognized type');
 }
 
@@ -211,8 +211,6 @@ export class BearerExprBuilder extends Builder implements ExprBuilderInterface {
     constructor(){
         super()
     }
-
-    getNode() { return this.node; }
 
     eq(lhs: ExprType, rhs: ExprType): Builder {
         this.node = new EqualsExprNode(asExprNode(lhs), asExprNode(rhs));
