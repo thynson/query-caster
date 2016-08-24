@@ -3,6 +3,7 @@ import {ValueBuilder} from "./value";
 export interface QueryBuilderOptions {
     escapeValue(value: any ): string;
     escapeIdentifier(name: string):string;
+    escapeFunction(fn: string): string;
 }
 
 

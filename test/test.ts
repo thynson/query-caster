@@ -4,7 +4,8 @@ import qc, {QueryBuilderOptions} from '../index';
 
 let defaultOpt: QueryBuilderOptions = {
     escapeValue: x => JSON.stringify(x),
-    escapeIdentifier: x => `"${x.replace(/"/g, '""')}"`
+    escapeIdentifier: x => `"${x.replace(/"/g, '""')}"`,
+    escapeFunction: x=>x
 };
 
 test('SelectBuilder', function(t: test.Test) {
