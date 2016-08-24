@@ -45,9 +45,9 @@ test('SelectBuilder', function(t: test.Test) {
         qc.select()
             .from('test')
             .where().eq('id', qc(1))
-            .and().eq('a', 'b')
+            .and().ne('a', 'b')
             .or().eq('user_id', qc(2)).toSQL(defaultOpt),
-        'SELECT * FROM "test" WHERE ( ( ( "id" = 1 ) AND ( "a" = "b" ) ) OR ( "user_id" = 2 ) )');
+        'SELECT * FROM "test" WHERE ( ( ( "id" = 1 ) AND ( "a" != "b" ) ) OR ( "user_id" = 2 ) )');
 
     t.equal(
         qc.select()
