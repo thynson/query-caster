@@ -244,6 +244,7 @@ export function asExprNode(x: ExprType): ExprNode {
     if (typeof x === 'string') return new ColumnExprNode(x);
     else if (x instanceof RawBuilder) return new RawExprNode(x.node);
     else if (x instanceof ValueBuilder) return new ValueExprNode(x.node);
+    else if (x instanceof BearerExprBuilder) return x.node;
     else throw new Error('Unrecognized type');
 }
 
