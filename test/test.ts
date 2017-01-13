@@ -1,4 +1,3 @@
-///<reference path="../typings/index.d.ts"/>
 import * as test from 'tape';
 import qc, {QueryBuilderOptions} from '../index';
 

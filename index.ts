@@ -1,4 +1,3 @@
-///<reference path="./typings/index.d.ts"/>
 import * as assert from 'assert';
 export * from './spec';
 import * as spec from './spec';
