@@ -5,7 +5,7 @@
   "main": "built/index.js",
   "typings": "built/index.d.ts",
   "scripts": {
-    "prepublish": "typings install && tsc",
+    "prepublish": "tsc",
     "test": "node -r ts-node/register test/test.ts | tap-summary",
     "test:coverage": "nyc -e .ts -i ts-node/register node test/test.ts",
     "coveralls": "nyc report -r text-lcov | coveralls"

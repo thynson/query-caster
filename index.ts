@@ -36,7 +36,7 @@ class JoinNode extends spec.Node {
                 segments.push('OUTER JOIN');
                 break;
             default:
-                throw new assert.AssertionError('dead path');
+                throw new assert.AssertionError({message:'dead path'});
         }
         if (typeof this.source === 'string') {
             segments.push(opt.escapeIdentifier(this.source));
