@@ -2,9 +2,26 @@ import * as test from 'tape';
 import qc, {QueryBuilderOptions} from '../index';
 
 let defaultOpt: QueryBuilderOptions = {
-    escapeValue: x => JSON.stringify(x),
+    escapeValue: function(this:QueryBuilderOptions, x:any) {
+        if (typeof x === 'number') {
+            return x.toString();
+        } else if (typeof x === 'string') {
+            return `'${x.replace(/'/g, '\'\'')}'`
+        } else if (typeof x === 'boolean') {
+            return x ? 'TRUE' : 'FALSE';
+        } else if (typeof x === 'undefined') {
+            return 'NULL';
+        } else if (typeof x === 'object') {
+            if (x === null) return 'NULL';
+            else if (x instanceof Date) {
+                return this.escapeDate(x);
+            } else
+                throw new TypeError("Unsupported value type");
+        }
+    },
+    escapeDate: (x: Date) => x.toJSON(),
     escapeIdentifier: x => `"${x.replace(/"/g, '""')}"`,
-    escapeFunction: x=>x
+    escapeFunction: x => x
 };
 
 test('ExprBuilder', (t: test.Test) => {

@@ -4,6 +4,7 @@
     "target": "es3",
     "outDir": "built",
     "sourceMap": true,
+    "types": ["node"],
     "declaration": true
   },
   "exclude": [

@@ -6,7 +6,7 @@
   "typings": "built/index.d.ts",
   "scripts": {
     "prepublish": "tsc",
-    "test": "node -r ts-node/register test/test.ts | tap-summary",
+    "test": "ts-node test/test.ts | tap-summary",
     "test:coverage": "nyc -e .ts -i ts-node/register node test/test.ts",
     "coveralls": "nyc report -r text-lcov | coveralls"
   },
@@ -22,13 +22,13 @@
   "author": "LAN Xingcan",
   "license": "ISC",
   "devDependencies": {
-    "@types/node": "^7.0.0",
+    "@types/node": "^9.3.0",
     "@types/tape": "^4.2.28",
-    "coveralls": "^2.11.15",
+    "coveralls": "^3.0.0",
     "nyc": "^8.4.0",
-    "tap-summary": "^3.0.1",
+    "tap-summary": "^4.0.0",
     "tape": "^4.6.3",
-    "ts-node": "^1.7.3",
+    "ts-node": "^4.0.0",
     "typescript": "^2.1.0"
   }
 }
